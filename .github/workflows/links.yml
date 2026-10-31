@@ -28,3 +28,8 @@ jobs:
             --exclude "\\.\\./\\.\\./issues"
             "./incidents/*.yaml" README.md
           fail: true
+      - name: List broken links as an annotation
+        if: failure()
+        run: |
+          msg=$(grep -E '^(### |\* \[)' lychee/out.md | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          echo "::error title=Broken source links::${msg}"
