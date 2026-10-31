@@ -141,7 +141,7 @@ that need a real example, and evaluating guardrail tools against real attack pat
 
 ## Contributing
 
-Know an incident that's missing? Open an [issue](../../issues/new?template=new-incident.yml) with a link, or
+Know an incident that's missing? Open an [issue](https://github.com/hasnat23/agent-postmortems/issues/new?template=new-incident.yml) with a link, or
 send a PR with a new YAML file. The bar for inclusion:
 
 - It happened to a real AI system (a product, an agent, an LLM feature), not a hypothetical.

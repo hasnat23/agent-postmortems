@@ -4,7 +4,7 @@ Thanks for helping. Every incident makes the next agent a bit safer.
 
 ## Quick path: open an issue
 
-Use the [new incident form](../../issues/new?template=new-incident.yml) with a link to a source. A maintainer
+Use the [new incident form](https://github.com/hasnat23/agent-postmortems/issues/new?template=new-incident.yml) with a link to a source. A maintainer
 will write the entry.
 
 ## Full path: send a pull request

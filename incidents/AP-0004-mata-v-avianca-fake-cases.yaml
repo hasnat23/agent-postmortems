@@ -17,6 +17,6 @@ mitigations:
 - Verify every citation in a primary database; never ask the model to verify itself.
 sources:
 - title: Wikipedia
-  url: https://en.wikipedia.org/wiki/Mata_v._Avianca,_Inc.
+  url: https://en.wikipedia.org/wiki/Mata_v._Avianca,_Inc%2E
 - title: LawSites
   url: https://www.lawnext.com/2023/06/court-imposes-sanctions-on-lawyers-who-filed-bogus-cases-after-relying-on-chatgpt-for-legal-research.html
