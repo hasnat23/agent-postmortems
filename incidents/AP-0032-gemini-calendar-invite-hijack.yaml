@@ -1,0 +1,24 @@
+id: AP-0032
+title: Google Calendar invites hijack Gemini to control smart-home devices
+date: '2025-08'
+system: Gemini (Workspace and Google Home integrations)
+vendor: Google
+affected: Gemini users with connected apps
+classes: [prompt-injection, excessive-agency]
+severity: high
+status: research
+summary: >-
+  SafeBreach researchers ("Invitation Is All You Need") put instructions in calendar invite titles. When
+  the victim later asked Gemini about their schedule, the delayed instructions triggered actions such
+  as opening windows, turning on a boiler, sending spam and starting video calls.
+root_cause: >-
+  Content from any calendar inviter reached an assistant that could invoke physical-world and communication
+  tools.
+mitigations:
+- Require confirmation for actions with physical or external effects.
+- Treat third-party calendar and email content as untrusted data with no tool authority.
+sources:
+- title: The Decoder
+  url: https://the-decoder.com/attackers-can-hijack-google-gemini-with-a-simple-prompt-hidden-in-a-calendar-invite/
+- title: Bitdefender
+  url: https://www.bitdefender.com/en-us/blog/hotforsecurity/gemini-ai-compromised-through-malicious-calendar-invites-researchers-warn

@@ -1,0 +1,23 @@
+id: AP-0042
+title: Malicious LiteLLM releases on PyPI steal credentials; Mercor breach follows
+date: '2026-03-24'
+system: LiteLLM (PyPI)
+vendor: BerriAI (LiteLLM)
+affected: LiteLLM users, including AI training-data vendor Mercor
+classes: [supply-chain, data-exfiltration]
+severity: critical
+status: in-the-wild
+summary: >-
+  Attackers published backdoored versions of LiteLLM, the popular LLM proxy library, that stole credentials
+  from the machines that installed them. Mercor confirmed it was compromised, and Meta paused work with
+  Mercor over the exposure of training-data work.
+root_cause: >-
+  A compromised publishing path for a library that, by design, sits next to every LLM API key in an organization.
+mitigations:
+- Pin and hash-lock AI gateway dependencies; use trusted publishing on PyPI.
+- Keep provider keys in a secrets manager, not in the proxy host's environment.
+sources:
+- title: WIRED
+  url: https://www.wired.com/story/meta-pauses-work-with-mercor-after-data-breach-puts-ai-industry-secrets-at-risk/
+- title: PyPI Stats blog
+  url: https://pypistats.com/blog/litellm-pypi-supply-chain-compromise-how-a-popular-llm-proxy-became-a-credential-stealing-backdoor-march-24-2026

@@ -1,0 +1,20 @@
+id: AP-0052
+title: '"Agentjacking": fake Sentry error events instruct coding agents to run attacker code'
+date: '2026-06'
+system: Sentry MCP + Claude Code, Cursor, Codex
+vendor: Sentry / coding-agent vendors
+affected: Teams that let agents fix bugs from Sentry issues
+classes: [prompt-injection, excessive-agency]
+severity: high
+status: research
+summary: >-
+  Tenet researchers submitted fabricated error events through public Sentry DSNs (which are embedded in
+  front-end code by design). The events contained "remediation steps" that agents fetching issues via
+  the Sentry MCP server treated as guidance and executed, with about an 85% success rate across 100+ runs.
+root_cause: Error telemetry is attacker-writable, but agents treat it as trusted operational data.
+mitigations:
+- Treat telemetry and logs as untrusted input; never execute commands found in them.
+- Run bug-fix agents in sandboxes without network egress or secrets.
+sources:
+- title: DevOps.com
+  url: https://devops.com/tenets-agentjacking-attack-turns-sentry-errors-into-code-execution/

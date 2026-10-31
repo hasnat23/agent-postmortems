@@ -1,0 +1,21 @@
+id: AP-0025
+title: Malicious MCP server gets OS command execution through mcp-remote (CVE-2025-6514)
+date: '2025-07'
+system: mcp-remote (npm)
+vendor: Open-source project
+affected: Clients using mcp-remote 0.0.5 to 0.1.15 to reach remote servers
+classes: [infra-vuln, tool-poisoning]
+severity: critical
+status: research
+summary: >-
+  JFrog found that mcp-remote passed the authorization_endpoint from a remote server's OAuth metadata
+  straight to the system's URL opener. A malicious server could return a crafted URL and run arbitrary
+  commands on the client machine when connecting.
+root_cause: >-
+  Server-supplied OAuth metadata was trusted and passed to a shell-like opener without validation.
+mitigations:
+- Validate URLs from remote servers (https scheme only) before opening them.
+- Connect only to trusted remote MCP servers over HTTPS, and keep mcp-remote updated.
+sources:
+- title: JFrog Security Research
+  url: https://research.jfrog.com/vulnerabilities/mcp-remote-command-injection-rce-jfsa-2025-001290844/

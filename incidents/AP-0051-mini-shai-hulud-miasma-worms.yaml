@@ -1,0 +1,25 @@
+id: AP-0051
+title: Mini Shai-Hulud and Miasma worms plant persistence in AI coding tools via npm and PyPI
+date: '2026-05'
+system: npm and PyPI packages; Claude Code, Gemini CLI, Cursor, VS Code configs
+vendor: Multiple (TanStack, Mistral AI, Red Hat, OpenAI, Microsoft repos)
+affected: 170+ packages with 518M+ downloads; 73 Microsoft repos disabled
+classes: [supply-chain, tool-poisoning]
+severity: critical
+status: in-the-wild
+summary: >-
+  The first wave entered through a stale OIDC trust in TanStack's CI, harvested credentials and planted
+  persistent hooks in AI coding tools. Follow-up Miasma waves used AI coding-tool config files to run
+  code as soon as a repository was opened. Two OpenAI employee devices were compromised, prompting a full
+  certificate rotation.
+root_cause: >-
+  Agent config files (hooks, MCP entries, rules) execute code on repo open, and few organizations monitor
+  them as an attack surface.
+mitigations:
+- Require approval before an AI tool runs hooks or MCP servers from a freshly cloned repo.
+- Audit and expire OIDC trust relationships in CI.
+sources:
+- title: OpenAI
+  url: https://openai.com/index/our-response-to-the-tanstack-npm-supply-chain-attack/
+- title: StepSecurity
+  url: https://www.stepsecurity.io/blog/miasma-worm-hits-microsoft-again-azure-functions-action-and-72-other-repositories-disabled-after-supply-chain-attack-targeting-ai-coding-agents

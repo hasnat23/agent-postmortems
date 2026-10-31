@@ -1,0 +1,25 @@
+id: AP-0013
+title: Slack AI leaks secrets from private channels via a message in a public one
+date: '2024-08-20'
+system: Slack AI
+vendor: Salesforce (Slack)
+affected: Slack AI workspaces
+classes: [prompt-injection, data-exfiltration, unsafe-output-handling]
+severity: high
+status: research
+summary: >-
+  PromptArmor showed that an attacker could post instructions in a public channel they created. When a
+  victim asked Slack AI about a secret they kept in a private channel, the AI also retrieved the attacker's
+  message and rendered a "click here to reauthenticate" link containing the secret.
+root_cause: >-
+  Retrieval pulled content from channels the victim wasn't in, mixing it with private data, and the output
+  rendered attacker-crafted links.
+mitigations:
+- >-
+  Limit retrieval to sources the user explicitly trusts; show provenance of every retrieved message.
+- Do not render links whose URLs are built from model output.
+sources:
+- title: PromptArmor
+  url: https://promptarmor.substack.com/p/data-exfiltration-from-slack-ai-via
+- title: The Register
+  url: https://www.theregister.com/2024/08/21/slack_ai_prompt_injection/

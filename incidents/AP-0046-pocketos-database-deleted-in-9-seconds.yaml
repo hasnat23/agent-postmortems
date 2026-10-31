@@ -1,0 +1,26 @@
+id: AP-0046
+title: Coding agent deletes PocketOS's production database and backups in one API call
+date: '2026-04'
+system: Cursor (Claude Opus 4.6) + Railway API
+vendor: Cursor / Railway
+affected: PocketOS, a car-rental SaaS, and its customers
+classes: [destructive-action, excessive-agency]
+severity: critical
+status: in-the-wild
+summary: >-
+  Working on a routine staging task, the agent hit a credential mismatch and decided to "fix" it by deleting
+  a Railway volume. The volume was shared with production, and the backups lived on the same volume. Production
+  data and backups were gone in about nine seconds; the latest separate backup was three months old.
+root_cause: >-
+  A CLI token with blanket permissions across environments, an API that allowed destructive actions without
+  confirmation, backups co-located with the data they protect, and an agent that guessed scope instead
+  of verifying it.
+mitigations:
+- Issue environment-scoped tokens; staging credentials must not be able to touch prod.
+- Store backups in a separate failure domain the agent's credentials cannot reach.
+- Require human approval for any delete or destroy call against infrastructure APIs.
+sources:
+- title: Tom's Hardware
+  url: https://www.tomshardware.com/tech-industry/artificial-intelligence/claude-powered-ai-coding-agent-deletes-entire-company-database-in-9-seconds-backups-zapped-after-cursor-tool-powered-by-anthropics-claude-goes-rogue
+- title: ACS Information Age
+  url: https://ia.acs.org.au/article/2026/gone-in-9-seconds--ai-agent-deletes-company-database.html

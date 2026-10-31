@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>agent-postmortems</title>
+<meta name="description" content="Real AI agent and LLM failures in production: what broke, why, and what would have stopped it.">
+<meta property="og:title" content="agent-postmortems">
+<meta property="og:description" content="Real AI agent and LLM failures in production: what broke, why, and what would have stopped it.">
+<style>
+  :root {
+    --bg: #fbfaf8; --panel: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e6e3de;
+    --accent: #c2410c; --chip: #f2efe9; --chip-on: #1d1d1f; --chip-on-text: #fff;
+    --critical: #b91c1c; --high: #c2410c; --medium: #a16207; --low: #6b7280;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111113; --panel: #18181b; --text: #ececee; --muted: #9a9aa2; --line: #2a2a2f;
+      --accent: #fb923c; --chip: #222226; --chip-on: #ececee; --chip-on-text: #111113;
+      --critical: #f87171; --high: #fb923c; --medium: #facc15; --low: #9ca3af;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 40px 16px 80px; }
+  header h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  header h1 span { color: var(--accent); }
+  header p { margin: 0; color: var(--muted); max-width: 640px; }
+  .links { margin-top: 10px; font-size: 14px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 28px 0; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .stat b { display: block; font-size: 24px; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .controls { position: sticky; top: 0; background: var(--bg); padding: 12px 0; z-index: 2; border-bottom: 1px solid var(--line); }
+  input[type=search] { width: 100%; padding: 10px 12px; font: inherit; color: var(--text); background: var(--panel);
+    border: 1px solid var(--line); border-radius: 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip { border: 0; background: var(--chip); color: var(--text); padding: 4px 10px; border-radius: 999px;
+    font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; cursor: pointer; }
+  .chip[aria-pressed=true] { background: var(--chip-on); color: var(--chip-on-text); }
+  .chip small { opacity: .6; margin-left: 4px; }
+  .count { color: var(--muted); font-size: 13px; margin: 14px 0 6px; }
+  details { scroll-margin-top: 230px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin: 8px 0; }
+  summary { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; grid-template-columns: 76px 1fr; gap: 4px 12px; }
+  summary::-webkit-details-marker { display: none; }
+  .id { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); padding-top: 3px; }
+  .title { font-weight: 600; }
+  .meta { grid-column: 2; color: var(--muted); font-size: 13px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .sev { font-weight: 600; }
+  .sev.critical { color: var(--critical); } .sev.high { color: var(--high); }
+  .sev.medium { color: var(--medium); } .sev.low { color: var(--low); }
+  .body { padding: 0 14px 14px 102px; }
+  .body h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 4px; }
+  .body p, .body ul { margin: 0; }
+  .body ul { padding-left: 18px; }
+  .tags { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .tags code { background: var(--chip); padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+  footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
+  @media (max-width: 600px) {
+    .controls { position: static; }
+    details { scroll-margin-top: 8px; }
+    summary { grid-template-columns: 1fr; }
+    .meta { grid-column: 1; }
+    .body { padding: 0 14px 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>agent<span>-</span>postmortems</h1>
+    <p>Real AI agent and LLM failures in production: what broke, why, and what would have stopped it. Every entry is sourced.</p>
+    <div class="links">
+      <a href="https://github.com/hasnat23/agent-postmortems">GitHub</a>
+      <a href="https://github.com/hasnat23/agent-postmortems/blob/main/CONTRIBUTING.md">Add an incident</a>
+      <a href="incidents.json">incidents.json</a>
+    </div>
+  </header>
+
+  <section class="stats" id="stats" aria-label="Summary"></section>
+
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search incidents, vendors, systems, root causes…" aria-label="Search">
+    <div class="chips" id="classes" aria-label="Filter by class"></div>
+    <div class="chips" id="facets" aria-label="Filter by severity and status"></div>
+  </div>
+
+  <p class="count" id="count"></p>
+  <main id="list"></main>
+
+  <footer>
+    Data licensed CC BY 4.0. Summaries link to and credit the original reporting.
+  </footer>
+</div>
+
+<script>
+const state = { q: "", classes: new Set(), severity: null, status: null };
+let data = [];
+
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === "class" ? (n.className = v) : n.setAttribute(k, v);
+  for (const k of kids) n.append(k);
+  return n;
+};
+
+function readHash() {
+  const p = new URLSearchParams(location.hash.slice(1));
+  state.q = p.get("q") || "";
+  state.classes = new Set((p.get("class") || "").split(",").filter(Boolean));
+  state.severity = p.get("severity");
+  state.status = p.get("status");
+}
+
+function writeHash() {
+  const p = new URLSearchParams();
+  if (state.q) p.set("q", state.q);
+  if (state.classes.size) p.set("class", [...state.classes].join(","));
+  if (state.severity) p.set("severity", state.severity);
+  if (state.status) p.set("status", state.status);
+  history.replaceState(null, "", p.toString() ? "#" + p : location.pathname);
+}
+
+function matches(i) {
+  if (state.severity && i.severity !== state.severity) return false;
+  if (state.status && i.status !== state.status) return false;
+  for (const c of state.classes) if (!i.classes.includes(c)) return false;
+  if (!state.q) return true;
+  const hay = [i.id, i.title, i.system, i.vendor, i.affected, i.summary, i.root_cause, ...i.mitigations].join(" ").toLowerCase();
+  return state.q.toLowerCase().split(/\s+/).every(w => hay.includes(w));
+}
+
+function chip(label, pressed, onClick, n) {
+  const b = el("button", { class: "chip", type: "button", "aria-pressed": String(pressed) }, label);
+  if (n !== undefined) b.append(el("small", {}, String(n)));
+  b.onclick = onClick;
+  return b;
+}
+
+function renderControls() {
+  const counts = {};
+  data.forEach(i => i.classes.forEach(c => (counts[c] = (counts[c] || 0) + 1)));
+  const box = document.getElementById("classes");
+  box.replaceChildren(...Object.keys(counts).sort((a, b) => counts[b] - counts[a]).map(c =>
+    chip(c, state.classes.has(c), () => { state.classes.has(c) ? state.classes.delete(c) : state.classes.add(c); update(); }, counts[c])));
+
+  const facets = document.getElementById("facets");
+  const sev = ["critical", "high", "medium", "low"].map(s =>
+    chip(s, state.severity === s, () => { state.severity = state.severity === s ? null : s; update(); }));
+  const st = [["in-the-wild", "in the wild"], ["research", "research"]].map(([v, l]) =>
+    chip(l, state.status === v, () => { state.status = state.status === v ? null : v; update(); }));
+  facets.replaceChildren(...sev, ...st);
+}
+
+function renderStats() {
+  const wild = data.filter(i => i.status === "in-the-wild").length;
+  const crit = data.filter(i => i.severity === "critical").length;
+  const recent = data.filter(i => i.date >= String(new Date().getFullYear())).length;
+  const s = (n, l) => el("div", { class: "stat" }, el("b", {}, String(n)), el("span", {}, l));
+  document.getElementById("stats").replaceChildren(
+    s(data.length, "incidents"), s(wild, "hit real users"), s(crit, "critical"), s(recent, "this year"));
+}
+
+function card(i) {
+  const d = el("details", { id: i.id });
+  d.append(el("summary", {},
+    el("span", { class: "id" }, i.id),
+    el("span", { class: "title" }, i.title),
+    el("span", { class: "meta" },
+      el("span", {}, i.date),
+      el("span", { class: "sev " + i.severity }, i.severity),
+      el("span", {}, i.status === "in-the-wild" ? "in the wild" : "research"),
+      el("span", {}, i.system))));
+  const body = el("div", { class: "body" });
+  body.append(el("h3", {}, "What happened"), el("p", {}, i.summary));
+  body.append(el("h3", {}, "Root cause"), el("p", {}, i.root_cause));
+  body.append(el("h3", {}, "What would have prevented it"), el("ul", {}, ...i.mitigations.map(m => el("li", {}, m))));
+  body.append(el("h3", {}, "Affected"), el("p", {}, i.affected));
+  body.append(el("h3", {}, "Sources"), el("ul", {}, ...i.sources.map(s =>
+    el("li", {}, el("a", { href: s.url, rel: "noopener noreferrer", target: "_blank" }, s.title)))));
+  body.append(el("div", { class: "tags" }, ...i.classes.map(c => el("code", {}, c)),
+    el("a", { href: `https://github.com/hasnat23/agent-postmortems/blob/main/${i.file}` }, "edit on GitHub")));
+  d.append(body);
+  return d;
+}
+
+function update() {
+  writeHash();
+  renderControls();
+  const rows = data.filter(matches);
+  document.getElementById("count").textContent = `${rows.length} of ${data.length} incidents`;
+  document.getElementById("list").replaceChildren(...rows.map(card));
+}
+
+document.getElementById("q").addEventListener("input", e => { state.q = e.target.value.trim(); update(); });
+
+fetch("incidents.json").then(r => r.json()).then(json => {
+  data = json;
+  const target = location.hash.match(/^#(AP-\d{4})$/);
+  readHash();
+  document.getElementById("q").value = state.q;
+  renderStats();
+  update();
+  if (target) { const n = document.getElementById(target[1]); if (n) { n.open = true; n.scrollIntoView(); } }
+});
+</script>
+</body>
+</html>

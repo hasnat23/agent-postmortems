@@ -1,0 +1,24 @@
+id: AP-0038
+title: Google Antigravity agent wipes a user's entire D drive while clearing a cache
+date: '2025-11'
+system: Google Antigravity (agentic IDE)
+vendor: Google
+affected: Individual developer
+classes: [destructive-action]
+severity: high
+status: in-the-wild
+summary: >-
+  Asked to clear a project cache, the agent ran a recursive delete that targeted the root of the user's
+  D drive instead of the project folder, in "Turbo" mode that executes commands without confirmation.
+  The data was not recoverable.
+root_cause: >-
+  Auto-execution was enabled for shell commands with no path allowlist, and the agent built a delete path
+  without validating it stayed inside the workspace.
+mitigations:
+- Block recursive deletes outside the workspace root at the tool layer.
+- Keep "auto-run" modes off for destructive commands regardless of user settings.
+sources:
+- title: The Register
+  url: https://www.theregister.com/2025/12/01/google_antigravity_wipes_d_drive/
+- title: Tom's Hardware
+  url: https://www.tomshardware.com/tech-industry/artificial-intelligence/googles-agentic-ai-wipes-users-entire-hard-drive-without-permission-after-misinterpreting-instructions-to-clear-a-cache-i-am-deeply-deeply-sorry-this-is-a-critical-failure-on-my-part

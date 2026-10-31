@@ -1,0 +1,23 @@
+id: AP-0027
+title: McDonald's AI hiring bot backend exposes 64 million applicant records behind "123456"
+date: '2025-07-09'
+system: McHire (Paradox.ai "Olivia")
+vendor: Paradox.ai
+affected: Up to 64 million job applicants
+classes: [infra-vuln]
+severity: high
+status: in-the-wild
+summary: >-
+  Security researchers Ian Carroll and Sam Curry logged into an old Paradox.ai test admin account with
+  the username and password "123456", then used an insecure direct object reference to access chat histories
+  and personal details of applicants. Paradox fixed it the same day.
+root_cause: >-
+  Classic web security failures (default credentials, no MFA, IDOR) around an AI product, not the model.
+mitigations:
+- Decommission test accounts; require SSO and MFA on admin panels.
+- Authorization checks on every record ID; AI products need the same appsec as any app.
+sources:
+- title: BleepingComputer
+  url: https://www.bleepingcomputer.com/news/security/123456-password-exposed-chats-for-64-million-mcdonalds-job-chatbot-applications/
+- title: Ian Carroll
+  url: https://ian.sh/mcdonalds

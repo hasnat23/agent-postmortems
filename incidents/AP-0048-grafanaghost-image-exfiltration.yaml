@@ -1,0 +1,19 @@
+id: AP-0048
+title: >-
+  GrafanaGhost, hidden instructions make Grafana's AI assistant leak data through an image URL
+date: '2026-04-07'
+system: Grafana AI assistant
+vendor: Grafana Labs
+affected: Grafana deployments using AI features
+classes: [prompt-injection, data-exfiltration, unsafe-output-handling]
+severity: high
+status: research
+summary: >-
+  Hidden instructions in external content caused the assistant to render an attacker-controlled image,
+  carrying enterprise data out in the URL's query parameters. Grafana patched it.
+root_cause: Model output could include arbitrary image URLs that the UI fetched automatically.
+mitigations:
+- Restrict rendered images to an allowlist of owned domains; strip query strings.
+sources:
+- title: SecurityWeek
+  url: https://www.securityweek.com/grafanaghost-attackers-can-abuse-grafana-to-leak-enterprise-data/

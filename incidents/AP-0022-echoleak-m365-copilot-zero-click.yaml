@@ -1,0 +1,25 @@
+id: AP-0022
+title: EchoLeak, a zero-click data exfiltration from Microsoft 365 Copilot via one email
+date: '2025-06-11'
+system: Microsoft 365 Copilot
+vendor: Microsoft
+affected: M365 Copilot tenants (patched server-side, CVE-2025-32711)
+classes: [prompt-injection, data-exfiltration, unsafe-output-handling]
+severity: critical
+status: research
+summary: >-
+  Aim Security sent an email whose text, phrased as instructions to the recipient, was later retrieved
+  by Copilot as context. It made Copilot embed sensitive data from the user's mailbox and files into a
+  reference-style markdown image URL that was fetched automatically through an allowed Microsoft domain.
+root_cause: >-
+  Retrieval mixed attacker-controlled email with privileged data, and the client rendered model-generated
+  links and images without stripping data-bearing URLs.
+mitigations:
+- Do not auto-render images or links from model output to arbitrary URLs; strict CSP.
+- >-
+  Label retrieved content by trust level and keep external content away from sensitive scopes.
+sources:
+- title: The Hacker News
+  url: https://thehackernews.com/2025/06/zero-click-ai-vulnerability-exposes.html
+- title: SecurityWeek
+  url: https://securityweek.com/echoleak-ai-attack-enabled-theft-of-sensitive-data-via-microsoft-365-copilot/

@@ -1,0 +1,21 @@
+id: AP-0016
+title: Cursor's AI support agent invents a "one device" policy and triggers cancellations
+date: '2025-04'
+system: Cursor support email agent ("Sam")
+vendor: Anysphere
+affected: Cursor users and the company's reputation
+classes: [hallucination]
+severity: medium
+status: in-the-wild
+summary: >-
+  Users were being logged out when switching machines because of a bug. The AI support agent told them
+  this was a new policy limiting subscriptions to one device. The policy did not exist; the answer spread
+  on Reddit and Hacker News and users cancelled before the company corrected it.
+root_cause: >-
+  An unlabeled AI agent answered support questions without grounding, and had no "I don't know" path.
+mitigations:
+- Label AI support replies as AI and escalate unknown causes to humans.
+- Restrict policy statements to retrieved, approved text.
+sources:
+- title: Fortune
+  url: https://fortune.com/article/customer-support-ai-cursor-went-rogue/

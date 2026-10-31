@@ -1,0 +1,25 @@
+id: AP-0021
+title: Asana's MCP server exposes data across customer organizations
+date: '2025-06'
+system: Asana MCP server
+vendor: Asana
+affected: About 1,000 customer organizations
+classes: [isolation-failure, infra-vuln]
+severity: high
+status: in-the-wild
+summary: >-
+  A logic flaw in Asana's newly launched MCP server let users in one organization see project and task
+  data from other organizations through AI integrations, for about a month. Asana took the server offline,
+  fixed it and notified affected customers.
+root_cause: >-
+  A tenant isolation bug in the MCP layer, which was a new access path that bypassed the checks the main
+  product enforced.
+mitigations:
+- >-
+  Treat MCP endpoints as new public APIs; run the same tenant-isolation tests as the main product.
+- Log which tenant's data each tool call returns and alert on cross-tenant reads.
+sources:
+- title: BleepingComputer
+  url: https://www.bleepingcomputer.com/news/security/asana-warns-mcp-ai-feature-exposed-customer-data-to-other-orgs/
+- title: The Register
+  url: https://theregister.com/2025/06/18/asana_mcp_server_bug/

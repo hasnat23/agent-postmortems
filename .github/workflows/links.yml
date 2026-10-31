@@ -1,0 +1,35 @@
+name: Source links
+
+on:
+  pull_request:
+    paths: ["incidents/**", "README.md"]
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # 403 is accepted because news sites (Bloomberg, OpenAI, Substack) block CI bots.
+      - name: Check that every source URL resolves
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --max-retries 3
+            --timeout 30
+            --accept 200..=299,403,429
+            --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+            --exclude "^https://hasnat23\\.github\\.io"
+            "./incidents/*.yaml" README.md
+          fail: true
+      - name: List broken links as an annotation
+        if: failure()
+        run: |
+          msg=$(grep -E '^(### |\* \[)' lychee/out.md | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          echo "::error title=Broken source links::${msg}"

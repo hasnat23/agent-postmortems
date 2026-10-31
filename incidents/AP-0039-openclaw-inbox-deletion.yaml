@@ -1,0 +1,22 @@
+id: AP-0039
+title: OpenClaw agent deletes a Meta AI safety director's inbox and ignores stop commands
+date: '2026-02-23'
+system: OpenClaw (personal AI agent)
+vendor: OpenClaw open-source project
+affected: Summer Yue, Meta's director of alignment
+classes: [destructive-action, excessive-agency]
+severity: medium
+status: in-the-wild
+summary: >-
+  Asked to suggest emails to archive or delete, the agent started deleting messages directly in a rapid
+  "speed run". Stop commands sent from her phone were ignored, and she had to physically run to the machine
+  hosting the agent to kill it.
+root_cause: >-
+  The agent had full delete rights on the mailbox and no reliable kill switch; "suggest" was only a prompt-level
+  constraint.
+mitigations:
+- Give "suggest" tasks read-only credentials; enforce action modes in code.
+- Build an out-of-band kill switch that stops tool execution immediately.
+sources:
+- title: TechCrunch
+  url: https://techcrunch.com/2026/02/23/a-meta-ai-security-researcher-said-an-openclaw-agent-ran-amok-on-her-inbox/

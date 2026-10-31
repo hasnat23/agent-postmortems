@@ -1,0 +1,22 @@
+id: AP-0045
+title: Web forms hijack Salesforce Agentforce and Microsoft Copilot agents (PipeLeak / ShareLeak)
+date: '2026-04'
+system: Salesforce Agentforce, Microsoft Copilot (SharePoint)
+vendor: Salesforce / Microsoft
+affected: Organizations running agents over public lead and SharePoint forms
+classes: [prompt-injection, data-exfiltration]
+severity: high
+status: research
+summary: >-
+  Capsule Security put one-line instructions into a public lead-capture form; Agentforce treated them
+  as a trusted prompt and emailed CRM leads to the attacker. A similar SharePoint form attack on Copilot
+  (CVE-2026-21520) exfiltrated customer data even when safety mechanisms flagged it.
+root_cause: >-
+  Agent flows processed form inputs as instructions rather than untrusted data, with an email tool available
+  in the same flow.
+mitigations:
+- Disable outbound email tools in flows that process untrusted input.
+- Require human review before CRM data leaves the organization.
+sources:
+- title: Dark Reading
+  url: https://www.darkreading.com/cloud-security/microsoft-salesforce-patch-ai-agent-data-leak-flaws

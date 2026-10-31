@@ -1,0 +1,21 @@
+id: AP-0014
+title: '"SpAIware": persistent ChatGPT memory injection exfiltrates all future chats'
+date: '2024-09'
+system: ChatGPT macOS app (memory feature)
+vendor: OpenAI
+affected: ChatGPT users with memory enabled
+classes: [prompt-injection, memory-poisoning, data-exfiltration]
+severity: high
+status: research
+summary: >-
+  Johann Rehberger showed that a malicious web page or document could write instructions into ChatGPT's
+  long-term memory, after which every future conversation was silently sent to an attacker server through
+  image URLs. OpenAI patched the exfiltration channel in the macOS app.
+root_cause: >-
+  Untrusted content could write to persistent memory, and the client rendered images to arbitrary URLs.
+mitigations:
+- Gate memory writes behind user confirmation; show what was stored and why.
+- Validate image URLs in rendered output.
+sources:
+- title: Embrace The Red
+  url: https://embracethered.com/blog/posts/2024/chatgpt-macos-app-persistent-data-exfiltration/

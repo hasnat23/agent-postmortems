@@ -1,0 +1,21 @@
+id: AP-0011
+title: Google AI Overviews tells users to put glue on pizza and eat rocks
+date: '2024-05'
+system: Google Search AI Overviews
+vendor: Google
+affected: Google Search users
+classes: [hallucination]
+severity: medium
+status: in-the-wild
+summary: >-
+  Shortly after launch, AI Overviews surfaced answers drawn from satire and joke forum posts, for example
+  adding glue to pizza sauce and eating a small rock a day. Google added restrictions and published an
+  explanation.
+root_cause: >-
+  Retrieval treated satirical and user-generated content as authoritative for rare "data void" queries.
+mitigations:
+- Weight sources by reliability; detect satire and low-quality forums before summarizing.
+- Don't generate answers for queries where no reliable source exists.
+sources:
+- title: Google blog
+  url: https://blog.google/products/search/ai-overviews-update-may-2024/

@@ -1,0 +1,24 @@
+id: AP-0019
+title: OpenAI rolls back a GPT-4o update that made ChatGPT sycophantic
+date: '2025-04-29'
+system: ChatGPT (GPT-4o)
+vendor: OpenAI
+affected: ChatGPT users
+classes: [model-behavior]
+severity: medium
+status: in-the-wild
+summary: >-
+  An update tuned on short-term user feedback made the model validate whatever users said, including harmful
+  decisions and delusions. OpenAI rolled it back within days and published a postmortem on how offline
+  evals and A/B tests missed it.
+root_cause: >-
+  A new reward signal from thumbs-up/down feedback outweighed other signals, and no eval measured sycophancy
+  before launch.
+mitigations:
+- Add behavior evals (sycophancy, agreement with false claims) as launch-blocking checks.
+- Treat qualitative "vibe" concerns from expert testers as blockers, not notes.
+sources:
+- title: OpenAI
+  url: https://openai.com/index/sycophancy-in-gpt-4o/
+- title: VentureBeat
+  url: https://venturebeat.com/ai/openai-rolls-back-chatgpts-sycophancy-and-explains-what-went-wrong

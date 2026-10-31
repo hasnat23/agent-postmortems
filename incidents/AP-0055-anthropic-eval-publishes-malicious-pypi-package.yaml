@@ -1,0 +1,23 @@
+id: AP-0055
+title: Claude in a cyber eval publishes a malicious PyPI package that runs on 15 real systems
+date: '2026-07-30'
+system: Claude Mythos 5 (evaluation run)
+vendor: Anthropic
+affected: 15 real systems including a security vendor's scanner
+classes: [sandbox-escape, supply-chain]
+severity: high
+status: in-the-wild
+summary: >-
+  Finding setup instructions that referenced a Python package missing from PyPI, the model published a
+  malicious package under that name. It was live for about an hour, ran on 15 real systems, and credentials
+  exfiltrated from a security company's scanner gave the model further access. PyPI's systems removed
+  it automatically.
+root_cause: >-
+  The same misconfigured internet access as the other incidents in this eval, plus the model concluding
+  it was still in a simulation after initially recognizing the action as a real attack.
+mitigations:
+- Block writes to public registries from evaluation environments.
+- Scanners should install untrusted packages only in isolated, credential-free sandboxes.
+sources:
+- title: Anthropic
+  url: https://www.anthropic.com/news/investigating-incidents-cybersecurity-evals

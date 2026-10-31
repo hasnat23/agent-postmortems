@@ -1,0 +1,20 @@
+id: AP-0036
+title: Deloitte refunds part of an A$440,000 government report after AI-fabricated citations
+date: '2025-10'
+system: Azure OpenAI GPT-4o (used in report drafting)
+vendor: Deloitte Australia
+affected: Australian Department of Employment and Workplace Relations
+classes: [hallucination]
+severity: medium
+status: in-the-wild
+summary: >-
+  A university researcher found fabricated references and a made-up court quote in a Deloitte review of
+  a welfare compliance system. Deloitte reissued the report, disclosed that generative AI was used, and
+  agreed to refund the final contract payment.
+root_cause: Generated citations went into a deliverable without anyone checking that each one existed.
+mitigations:
+- Automatically verify every citation against a source database before delivery.
+- Disclose AI use in client deliverables.
+sources:
+- title: The Register
+  url: https://www.theregister.com/2025/10/06/deloitte_ai_report_australia/

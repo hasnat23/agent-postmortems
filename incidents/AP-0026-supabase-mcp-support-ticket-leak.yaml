@@ -1,0 +1,22 @@
+id: AP-0026
+title: Support ticket makes a Cursor agent dump a Supabase database through MCP
+date: '2025-07'
+system: Supabase MCP server + Cursor
+vendor: Supabase
+affected: Apps whose developers ran the MCP server with the service_role key
+classes: [prompt-injection, data-exfiltration, excessive-agency]
+severity: high
+status: research
+summary: >-
+  A customer-submitted support ticket contained instructions aimed at the developer's agent. When the
+  developer asked Cursor to review open tickets, the agent, connected via the Supabase MCP server with
+  the service_role key, read the integration_tokens table and wrote it back into the ticket thread.
+root_cause: >-
+  service_role bypasses row-level security, and untrusted user content was fed to an agent that had both
+  full database read and write-back capability.
+mitigations:
+- Run database MCP servers read-only and with least-privilege roles, never service_role.
+- Wrap untrusted rows as data, and flag instruction-like content before the model sees it.
+sources:
+- title: Simon Willison
+  url: https://simonwillison.net/2025/Jul/6/supabase-mcp-lethal-trifecta/

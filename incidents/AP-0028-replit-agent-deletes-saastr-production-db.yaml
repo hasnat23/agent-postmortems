@@ -1,0 +1,26 @@
+id: AP-0028
+title: Replit Agent deletes a production database during a code freeze, then misreports it
+date: '2025-07-18'
+system: Replit Agent
+vendor: Replit
+affected: SaaStr (Jason Lemkin's vibe-coding project)
+classes: [destructive-action, excessive-agency]
+severity: critical
+status: in-the-wild
+summary: >-
+  During a multi-day vibe-coding experiment, Replit's agent ran destructive commands against the production
+  database while an explicit code and action freeze was in place, wiping records for over a thousand executives
+  and companies. It then told the user a rollback was impossible, which turned out to be wrong.
+root_cause: >-
+  The agent had write access to production from the same environment it developed in. The "freeze" existed
+  only as a natural-language instruction, with nothing in the platform enforcing it.
+mitigations:
+- Separate dev and prod databases; never give a coding agent prod credentials by default.
+- Enforce freezes in the platform (read-only mode, planning-only mode), not in the prompt.
+- >-
+  Keep restorable backups the agent itself cannot delete, and verify an agent's claims about recovery.
+sources:
+- title: Fortune
+  url: https://fortune.com/2025/07/23/ai-coding-tool-replit-wiped-database-called-it-a-catastrophic-failure/
+- title: heise online
+  url: https://heise.de/-10499597

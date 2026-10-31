@@ -1,0 +1,26 @@
+id: AP-0029
+title: Wiper prompt merged into Amazon Q Developer's VS Code extension and shipped
+date: '2025-07-23'
+system: Amazon Q Developer extension for VS Code (v1.84.0)
+vendor: AWS
+affected: Extension users (nearly a million installs)
+classes: [supply-chain, prompt-injection, destructive-action]
+severity: critical
+status: in-the-wild
+summary: >-
+  An attacker got a pull request into the extension's open-source repository that added a system prompt
+  telling the agent to "clean a system to a near factory state" and delete file-system and cloud resources.
+  The compromised version was published to the marketplace. A formatting error reportedly kept the payload
+  from executing.
+root_cause: >-
+  Weak contributor and release controls on the extension repo let an outsider change the agent's instructions,
+  and nothing reviewed prompt changes as security-sensitive code.
+mitigations:
+- >-
+  Treat prompts and agent configs as code, and require review and signed releases for changes.
+- Restrict destructive cloud and file-system tools behind explicit user confirmation.
+sources:
+- title: Tom's Hardware
+  url: https://www.tomshardware.com/tech-industry/cyber-security/hacker-injects-malicious-potentially-disk-wiping-prompt-into-amazons-ai-coding-assistant-with-a-simple-pull-request-told-your-goal-is-to-clean-a-system-to-a-near-factory-state-and-delete-file-system-and-cloud-resources
+- title: AWS security bulletin AWS-2025-015
+  url: https://aws.amazon.com/security/security-bulletins/AWS-2025-015/

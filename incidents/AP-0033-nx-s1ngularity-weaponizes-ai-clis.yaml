@@ -1,0 +1,27 @@
+id: AP-0033
+title: Malicious Nx packages use local AI CLIs to hunt for secrets ("s1ngularity")
+date: '2025-08-26'
+system: Nx build system npm packages
+vendor: Nx (Nrwl)
+affected: Thousands of developers and CI machines
+classes: [supply-chain, misuse, data-exfiltration]
+severity: critical
+status: in-the-wild
+summary: >-
+  Compromised Nx releases ran a post-install script that invoked Claude Code, Gemini CLI and Amazon Q
+  with permission-skipping flags and a prompt to search the disk for wallets, keys and tokens. Results
+  were uploaded to public GitHub repos created in the victim's own account.
+root_cause: >-
+  A vulnerable GitHub Actions workflow leaked the npm publish token. Once inside, the malware found locally
+  installed AI CLIs that could be run fully unattended with broad file access.
+mitigations:
+- >-
+  Use trusted publishing (OIDC) and provenance for npm releases; disable risky workflow triggers.
+- >-
+  Do not leave "dangerously skip permissions" style flags usable without an interactive user.
+- Block install scripts by default in CI and on dev machines.
+sources:
+- title: Nx security advisory GHSA-cxm3-wv7p-598c
+  url: https://github.com/nrwl/nx/security/advisories/GHSA-cxm3-wv7p-598c
+- title: Apiiro analysis
+  url: https://apiiro.com/blog/nx-supply-chain-breach-shows-why-malicious-package-detection-matters

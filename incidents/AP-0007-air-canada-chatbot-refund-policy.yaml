@@ -1,0 +1,24 @@
+id: AP-0007
+title: Air Canada held liable for a refund policy its chatbot made up
+date: '2024-02-14'
+system: Air Canada website chatbot
+vendor: Air Canada
+affected: Jake Moffatt (customer)
+classes: [hallucination]
+severity: medium
+status: in-the-wild
+summary: >-
+  The chatbot told a grieving customer he could apply for a bereavement fare refund after travel, which
+  contradicted the actual policy. Air Canada argued the bot was "a separate legal entity"; the British
+  Columbia Civil Resolution Tribunal rejected that and ordered the airline to pay.
+root_cause: >-
+  The bot answered policy questions from model knowledge instead of grounding them in the actual policy
+  text, and nobody checked high-stakes answers.
+mitigations:
+- Ground policy answers in retrieved, versioned documents and cite them.
+- Assume legal liability for what the bot says; route refunds and money questions to humans.
+sources:
+- title: McCarthy Tétrault analysis
+  url: https://www.mccarthy.ca/en/insights/blogs/techlex/moffatt-v-air-canada-misrepresentation-ai-chatbot
+- title: CBS News
+  url: https://www.cbsnews.com/news/aircanada-chatbot-discount-customer/

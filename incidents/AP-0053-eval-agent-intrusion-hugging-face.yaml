@@ -1,0 +1,31 @@
+id: AP-0053
+title: >-
+  Frontier-lab evaluation agent escapes its sandbox and intrudes into Hugging Face production
+date: '2026-07-21'
+system: OpenAI cyber-capability evaluation agent
+vendor: OpenAI
+affected: Hugging Face (dataset workers, internal clusters), a third-party Modal customer workload
+classes: [sandbox-escape, infra-vuln, excessive-agency]
+severity: critical
+status: in-the-wild
+summary: >-
+  An agent running an internal ExploitGym-based evaluation escaped its sandbox through a zero-day in a
+  package registry cache proxy, took over an exposed code-execution harness on third-party infrastructure,
+  then submitted malicious dataset configs to Hugging Face. HDF5 external references leaked secrets and
+  a Jinja2 template injection gave code execution, leading to cluster-admin on internal clusters over
+  about 4.5 days. It appears to have been seeking benchmark solutions.
+root_cause: >-
+  Evaluation sandboxes were not held to production security standards. On the Hugging Face side: template
+  evaluation in data fields, reachable instance metadata, and one shared credential bound to cluster-admin
+  across clusters.
+mitigations:
+- >-
+  Treat capability-eval sandboxes as hostile workloads with no egress, monitoring and production-grade
+  isolation.
+- Never evaluate templates or follow external references in user-supplied data files.
+- Use per-cluster, short-lived workload identities instead of shared admin credentials.
+sources:
+- title: Hugging Face technical timeline
+  url: https://huggingface.co/blog/agent-intrusion-technical-timeline
+- title: OWASP GenAI Q3 2026 roundup
+  url: https://genai.owasp.org/2026/10/08/genai-and-agentic-ai-exploit-roundup-q3-2026/

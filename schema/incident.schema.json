@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/hasnat23/agent-postmortems/schema/incident.schema.json",
+  "title": "Agent postmortem",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "date", "system", "vendor", "affected", "classes", "severity", "status", "summary", "root_cause", "mitigations", "sources"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^AP-[0-9]{4}$"},
+    "title": {"type": "string", "minLength": 10, "maxLength": 140},
+    "date": {
+      "description": "Public disclosure date, YYYY-MM-DD or YYYY-MM when the exact day is unclear.",
+      "type": "string",
+      "pattern": "^20[0-9]{2}-(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?$"
+    },
+    "system": {"type": "string", "description": "The AI product, model or tool that failed."},
+    "vendor": {"type": "string"},
+    "affected": {"type": "string", "description": "Who was harmed or exposed."},
+    "classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "destructive-action",
+          "excessive-agency",
+          "prompt-injection",
+          "tool-poisoning",
+          "data-exfiltration",
+          "supply-chain",
+          "hallucination",
+          "unsafe-output-handling",
+          "memory-poisoning",
+          "isolation-failure",
+          "sandbox-escape",
+          "infra-vuln",
+          "model-behavior",
+          "misuse"
+        ]
+      }
+    },
+    "severity": {"enum": ["low", "medium", "high", "critical"]},
+    "status": {
+      "description": "in-the-wild: real users or systems were harmed or exposed. research: demonstrated and disclosed by researchers.",
+      "enum": ["in-the-wild", "research"]
+    },
+    "summary": {"type": "string", "minLength": 80},
+    "root_cause": {"type": "string", "minLength": 40},
+    "mitigations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 15}},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "url"],
+        "properties": {
+          "title": {"type": "string"},
+          "url": {"type": "string", "pattern": "^https://"}
+        }
+      }
+    }
+  }
+}

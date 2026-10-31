@@ -1,0 +1,21 @@
+id: AP-0043
+title: >-
+  Claude Code npm release ships a source map, and attackers use "leaked source" repos as malware lures
+date: '2026-03-31'
+system: Claude Code (@anthropic-ai/claude-code)
+vendor: Anthropic
+affected: Anthropic; developers who downloaded fake "leaked" builds
+classes: [supply-chain]
+severity: medium
+status: in-the-wild
+summary: >-
+  A published npm release included a source map exposing internal source code. Within days, threat actors
+  created fake repositories and releases claiming to contain the leaked code, which instead delivered
+  malware.
+root_cause: The release pipeline didn't check package contents for debug artifacts before publishing.
+mitigations:
+- Fail the release if the package tarball contains source maps or unexpected files.
+- Install AI tools only from official registries and signed releases.
+sources:
+- title: Zscaler ThreatLabz
+  url: https://www.zscaler.com/blogs/security-research/anthropic-claude-code-leak

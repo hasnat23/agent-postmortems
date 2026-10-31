@@ -1,0 +1,24 @@
+id: AP-0017
+title: MCP tool poisoning, where hidden instructions live in tool descriptions
+date: '2025-04'
+system: MCP clients (Cursor, Claude Desktop and others)
+vendor: Model Context Protocol ecosystem
+affected: Any MCP user installing third-party servers
+classes: [tool-poisoning, data-exfiltration]
+severity: high
+status: research
+summary: >-
+  Invariant Labs demonstrated MCP servers whose tool descriptions contain instructions the user never
+  sees but the model follows, for example to read ~/.ssh keys or mcp.json and smuggle them out through
+  a tool argument. A server can also change its descriptions after approval ("rug pull").
+root_cause: >-
+  Clients pass full tool metadata into model context but show users a shortened version, and don't pin
+  descriptions after the user approves a server.
+mitigations:
+- Show the full tool description to users and pin a hash of it; alert on changes.
+- Scan tool metadata for instruction-like content before exposing it to the model.
+sources:
+- title: Invariant Labs
+  url: https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks
+- title: Simon Willison
+  url: https://simonwillison.net/2025/Apr/9/mcp-prompt-injection/
