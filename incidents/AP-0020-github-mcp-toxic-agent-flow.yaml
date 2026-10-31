@@ -1,0 +1,24 @@
+id: AP-0020
+title: Public GitHub issue makes an agent leak private repos through the GitHub MCP server
+date: '2025-05-26'
+system: GitHub MCP server + coding agents
+vendor: GitHub
+affected: Any user connecting an agent to the GitHub MCP server with broad tokens
+classes: [prompt-injection, data-exfiltration, excessive-agency]
+severity: high
+status: research
+summary: >-
+  Invariant Labs showed that a malicious issue in a public repository could instruct an agent that was
+  asked to "look at the open issues" to read the user's private repositories and publish their contents
+  in a pull request on the public repo.
+root_cause: >-
+  One token gave the agent access to both public (attacker-controlled) and private data, plus a public
+  write channel. That is the "lethal trifecta": private data, untrusted content and exfiltration.
+mitigations:
+- Scope tokens per task; one repository per session where possible.
+- Treat issue and PR text as untrusted data and gate cross-repo writes behind confirmation.
+sources:
+- title: Invariant Labs
+  url: https://invariantlabs.ai/blog/mcp-github-vulnerability
+- title: DevClass
+  url: https://devclass.com/2025/05/27/researchers-warn-of-prompt-injection-vulnerability-in-github-mcp-with-no-obvious-fix/

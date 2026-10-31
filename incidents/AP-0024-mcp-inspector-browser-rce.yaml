@@ -1,0 +1,22 @@
+id: AP-0024
+title: Browser-based RCE in Anthropic's MCP Inspector developer tool (CVE-2025-49596)
+date: '2025-07'
+system: MCP Inspector
+vendor: Anthropic
+affected: Developers running MCP Inspector below 0.14.1
+classes: [infra-vuln]
+severity: critical
+status: research
+summary: >-
+  MCP Inspector's local proxy listened without authentication. Oligo showed that a malicious web page
+  could reach it from the browser (the "0.0.0.0 day" plus CSRF) and launch arbitrary commands on the developer's
+  machine. Fixed in 0.14.1 with session tokens and origin checks.
+root_cause: A local dev server trusted every request from localhost and exposed process spawning.
+mitigations:
+- Bind local tools to 127.0.0.1 with auth tokens and Origin checks.
+- Never expose process-spawning endpoints without authentication, even locally.
+sources:
+- title: Oligo Security
+  url: https://www.oligo.security/blog/critical-rce-vulnerability-in-anthropic-mcp-inspector-cve-2025-49596
+- title: The Hacker News
+  url: https://thehackernews.com/2025/07/critical-vulnerability-in-anthropics.html

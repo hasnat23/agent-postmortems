@@ -1,0 +1,25 @@
+id: AP-0008
+title: Hallucinated "huggingface-cli" package gets thousands of real installs
+date: '2024-03'
+system: Code assistants (ChatGPT, Gemini and others)
+vendor: Multiple
+affected: Developers following AI-generated install instructions, including a major company's README
+classes: [hallucination, supply-chain]
+severity: high
+status: in-the-wild
+summary: >-
+  Lasso Security's Bar Lanyado noticed models repeatedly recommended `pip install huggingface-cli`, a
+  package that didn't exist. He published an empty package under that name as a test; it was downloaded
+  more than 30,000 times in three months, and appeared in install instructions of a large company's repository.
+  This is the attack now called slopsquatting.
+root_cause: >-
+  Models hallucinate plausible package names consistently, and package registries let anyone claim them.
+mitigations:
+- >-
+  Verify that suggested packages exist and are maintained before installing; use allowlists in CI.
+- Registries can reserve or monitor frequently hallucinated names.
+sources:
+- title: Dark Reading
+  url: https://www.darkreading.com/application-security/pervasive-llm-hallucinations-expand-code-developer-attack-surface
+- title: The Batch (DeepLearning.AI)
+  url: https://www.deeplearning.ai/the-batch/researcher-exposes-risks-in-ai-generated-code/

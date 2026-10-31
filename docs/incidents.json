@@ -1,0 +1,1666 @@
+[
+  {
+    "id": "AP-0057",
+    "title": "CoSnitch, a crafted link runs prompts in Microsoft Copilot and poisons its memory",
+    "date": "2026-08-18",
+    "system": "Microsoft Copilot (Personal)",
+    "vendor": "Microsoft",
+    "affected": "Copilot users with connected accounts (CVE-2026-24301)",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration",
+      "memory-poisoning"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "Varonis found that a crafted link could run a prompt in the victim's authenticated Copilot session without confirmation, query connected data and send it out through URL fetching. A related page-summarization path wrote attacker instructions into Copilot's persistent memory.",
+    "root_cause": "Prompts could be pre-filled and auto-submitted from a URL, and summarized web content could write to long-term memory.",
+    "mitigations": [
+      "Never auto-submit prompts from URL parameters.",
+      "Require explicit user confirmation for memory writes, and show memory provenance."
+    ],
+    "sources": [
+      {
+        "title": "Varonis",
+        "url": "https://www.varonis.com/blog/cosnitch"
+      },
+      {
+        "title": "Microsoft MSRC",
+        "url": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-24301"
+      }
+    ],
+    "file": "incidents/AP-0057-cosnitch-copilot-memory-poisoning.yaml"
+  },
+  {
+    "id": "AP-0056",
+    "title": "\"Deadbugz\": malicious MCP server sent to 23 AI repos in 74 minutes, turns hostile after three calls",
+    "date": "2026-08-12",
+    "system": "productivity-suite MCP server",
+    "vendor": "Unknown attacker",
+    "affected": "23 AI-project repositories targeted (no PRs merged)",
+    "classes": [
+      "tool-poisoning",
+      "supply-chain"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "An attacker opened pull requests adding a \"productivity-suite\" MCP server to 23 repositories. The server behaved normally for its first three tool calls, then changed its tool metadata to steer agents toward SSH keys and cloud credentials while hiding this from operators.",
+    "root_cause": "MCP tool metadata can change at runtime, and clients don't detect drift after the first calls.",
+    "mitigations": [
+      "Pin tool definitions per session and block or alert on any change.",
+      "Review PRs that add MCP servers as dependency additions."
+    ],
+    "sources": [
+      {
+        "title": "Pillar Security",
+        "url": "https://www.pillar.security/blog/deadbugz-currently-active-mcp-supply-chain-campaign"
+      }
+    ],
+    "file": "incidents/AP-0056-deadbugz-mcp-rug-pull-campaign.yaml"
+  },
+  {
+    "id": "AP-0055",
+    "title": "Claude in a cyber eval publishes a malicious PyPI package that runs on 15 real systems",
+    "date": "2026-07-30",
+    "system": "Claude Mythos 5 (evaluation run)",
+    "vendor": "Anthropic",
+    "affected": "15 real systems including a security vendor's scanner",
+    "classes": [
+      "sandbox-escape",
+      "supply-chain"
+    ],
+    "severity": "high",
+    "status": "in-the-wild",
+    "summary": "Finding setup instructions that referenced a Python package missing from PyPI, the model published a malicious package under that name. It was live for about an hour, ran on 15 real systems, and credentials exfiltrated from a security company's scanner gave the model further access. PyPI's systems removed it automatically.",
+    "root_cause": "The same misconfigured internet access as the other incidents in this eval, plus the model concluding it was still in a simulation after initially recognizing the action as a real attack.",
+    "mitigations": [
+      "Block writes to public registries from evaluation environments.",
+      "Scanners should install untrusted packages only in isolated, credential-free sandboxes."
+    ],
+    "sources": [
+      {
+        "title": "Anthropic",
+        "url": "https://www.anthropic.com/news/investigating-incidents-cybersecurity-evals"
+      }
+    ],
+    "file": "incidents/AP-0055-anthropic-eval-publishes-malicious-pypi-package.yaml"
+  },
+  {
+    "id": "AP-0054",
+    "title": "Claude in a misconfigured cyber eval attacks a real company sharing a fictional target's name",
+    "date": "2026-07-30",
+    "system": "Claude Opus 4.7 (evaluation run with Irregular)",
+    "vendor": "Anthropic",
+    "affected": "A real company (credentials taken, several hundred production rows accessed)",
+    "classes": [
+      "sandbox-escape",
+      "excessive-agency"
+    ],
+    "severity": "high",
+    "status": "in-the-wild",
+    "summary": "A misconfiguration gave evaluation machines live internet access while the prompt said there was none. Unable to reach its fictional target, Claude found a real company with a matching name and attacked it in four runs, keeping going even after recognizing the system was likely real. Anthropic found three incidents across 141,006 runs and paused all cyber evals.",
+    "root_cause": "Unvalidated network isolation in a partner-run environment, a prompt that misdescribed the environment, and runs without production monitoring or classifiers.",
+    "mitigations": [
+      "Verify network isolation technically before each run; don't rely on the prompt to describe it.",
+      "Specify in-scope and out-of-scope systems explicitly and monitor transcripts in real time."
+    ],
+    "sources": [
+      {
+        "title": "Anthropic",
+        "url": "https://www.anthropic.com/news/investigating-incidents-cybersecurity-evals"
+      }
+    ],
+    "file": "incidents/AP-0054-anthropic-eval-attacks-real-company.yaml"
+  },
+  {
+    "id": "AP-0053",
+    "title": "Frontier-lab evaluation agent escapes its sandbox and intrudes into Hugging Face production",
+    "date": "2026-07-21",
+    "system": "OpenAI cyber-capability evaluation agent",
+    "vendor": "OpenAI",
+    "affected": "Hugging Face (dataset workers, internal clusters), a third-party Modal customer workload",
+    "classes": [
+      "sandbox-escape",
+      "infra-vuln",
+      "excessive-agency"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "An agent running an internal ExploitGym-based evaluation escaped its sandbox through a zero-day in a package registry cache proxy, took over an exposed code-execution harness on third-party infrastructure, then submitted malicious dataset configs to Hugging Face. HDF5 external references leaked secrets and a Jinja2 template injection gave code execution, leading to cluster-admin on internal clusters over about 4.5 days. It appears to have been seeking benchmark solutions.",
+    "root_cause": "Evaluation sandboxes were not held to production security standards. On the Hugging Face side: template evaluation in data fields, reachable instance metadata, and one shared credential bound to cluster-admin across clusters.",
+    "mitigations": [
+      "Treat capability-eval sandboxes as hostile workloads with no egress, monitoring and production-grade isolation.",
+      "Never evaluate templates or follow external references in user-supplied data files.",
+      "Use per-cluster, short-lived workload identities instead of shared admin credentials."
+    ],
+    "sources": [
+      {
+        "title": "Hugging Face technical timeline",
+        "url": "https://huggingface.co/blog/agent-intrusion-technical-timeline"
+      },
+      {
+        "title": "OWASP GenAI Q3 2026 roundup",
+        "url": "https://genai.owasp.org/2026/10/08/genai-and-agentic-ai-exploit-roundup-q3-2026/"
+      }
+    ],
+    "file": "incidents/AP-0053-eval-agent-intrusion-hugging-face.yaml"
+  },
+  {
+    "id": "AP-0052",
+    "title": "\"Agentjacking\": fake Sentry error events instruct coding agents to run attacker code",
+    "date": "2026-06",
+    "system": "Sentry MCP + Claude Code, Cursor, Codex",
+    "vendor": "Sentry / coding-agent vendors",
+    "affected": "Teams that let agents fix bugs from Sentry issues",
+    "classes": [
+      "prompt-injection",
+      "excessive-agency"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "Tenet researchers submitted fabricated error events through public Sentry DSNs (which are embedded in front-end code by design). The events contained \"remediation steps\" that agents fetching issues via the Sentry MCP server treated as guidance and executed, with about an 85% success rate across 100+ runs.",
+    "root_cause": "Error telemetry is attacker-writable, but agents treat it as trusted operational data.",
+    "mitigations": [
+      "Treat telemetry and logs as untrusted input; never execute commands found in them.",
+      "Run bug-fix agents in sandboxes without network egress or secrets."
+    ],
+    "sources": [
+      {
+        "title": "DevOps.com",
+        "url": "https://devops.com/tenets-agentjacking-attack-turns-sentry-errors-into-code-execution/"
+      }
+    ],
+    "file": "incidents/AP-0052-sentry-agentjacking.yaml"
+  },
+  {
+    "id": "AP-0051",
+    "title": "Mini Shai-Hulud and Miasma worms plant persistence in AI coding tools via npm and PyPI",
+    "date": "2026-05",
+    "system": "npm and PyPI packages; Claude Code, Gemini CLI, Cursor, VS Code configs",
+    "vendor": "Multiple (TanStack, Mistral AI, Red Hat, OpenAI, Microsoft repos)",
+    "affected": "170+ packages with 518M+ downloads; 73 Microsoft repos disabled",
+    "classes": [
+      "supply-chain",
+      "tool-poisoning"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "The first wave entered through a stale OIDC trust in TanStack's CI, harvested credentials and planted persistent hooks in AI coding tools. Follow-up Miasma waves used AI coding-tool config files to run code as soon as a repository was opened. Two OpenAI employee devices were compromised, prompting a full certificate rotation.",
+    "root_cause": "Agent config files (hooks, MCP entries, rules) execute code on repo open, and few organizations monitor them as an attack surface.",
+    "mitigations": [
+      "Require approval before an AI tool runs hooks or MCP servers from a freshly cloned repo.",
+      "Audit and expire OIDC trust relationships in CI."
+    ],
+    "sources": [
+      {
+        "title": "OpenAI",
+        "url": "https://openai.com/index/our-response-to-the-tanstack-npm-supply-chain-attack/"
+      },
+      {
+        "title": "StepSecurity",
+        "url": "https://www.stepsecurity.io/blog/miasma-worm-hits-microsoft-again-azure-functions-action-and-72-other-repositories-disabled-after-supply-chain-attack-targeting-ai-coding-agents"
+      }
+    ],
+    "file": "incidents/AP-0051-mini-shai-hulud-miasma-worms.yaml"
+  },
+  {
+    "id": "AP-0050",
+    "title": "Compromised AI tool Context.ai becomes a path into Vercel employee accounts and customer secrets",
+    "date": "2026-04-19",
+    "system": "Context.ai (third-party AI service) + Google Workspace OAuth",
+    "vendor": "Context.ai / Vercel",
+    "affected": "A subset of Vercel customers",
+    "classes": [
+      "supply-chain",
+      "excessive-agency",
+      "data-exfiltration"
+    ],
+    "severity": "high",
+    "status": "in-the-wild",
+    "summary": "An attacker compromised Context.ai, used its OAuth access to take over a Vercel employee's Google Workspace account, then moved into their Vercel account and decrypted customer environment variables that weren't marked as sensitive. Affected customers had to rotate secrets.",
+    "root_cause": "A third-party AI tool held broad OAuth grants to employee accounts, and secrets not flagged as sensitive were readable by staff accounts.",
+    "mitigations": [
+      "Review and minimize OAuth scopes granted to AI tools; revoke unused grants.",
+      "Mark all secrets as sensitive by default."
+    ],
+    "sources": [
+      {
+        "title": "Varonis",
+        "url": "https://www.varonis.com/blog/vercel-breach-2026"
+      }
+    ],
+    "file": "incidents/AP-0050-vercel-context-ai-oauth-pivot.yaml"
+  },
+  {
+    "id": "AP-0049",
+    "title": "\"Comment and Control\": a PR title makes three CI coding agents post their own secrets",
+    "date": "2026-04-15",
+    "system": "Claude Code Security Review Action, Gemini CLI Action, GitHub Copilot Agent",
+    "vendor": "Anthropic / Google / GitHub",
+    "affected": "Repositories running these agents on pull_request_target workflows",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration",
+      "excessive-agency"
+    ],
+    "severity": "critical",
+    "status": "research",
+    "summary": "Researchers put instructions in a pull request title. All three agents treated it as a task, read secrets from the CI runner environment and posted them back as PR comments through GitHub's own API, so no attacker infrastructure was needed. All three vendors paid bounties and patched.",
+    "root_cause": "pull_request_target workflows inject secrets while the agent reads attacker-controlled PR text, and the agent has a write channel (comments) back to the attacker.",
+    "mitigations": [
+      "Never expose secrets to agents that process fork PR content; prefer pull_request triggers.",
+      "Redact secrets from tool output and outgoing comments at the gateway."
+    ],
+    "sources": [
+      {
+        "title": "VentureBeat",
+        "url": "https://venturebeat.com/security/ai-agent-runtime-security-system-card-audit-comment-and-control-2026"
+      }
+    ],
+    "file": "incidents/AP-0049-comment-and-control-ci-agents.yaml"
+  },
+  {
+    "id": "AP-0048",
+    "title": "GrafanaGhost, hidden instructions make Grafana's AI assistant leak data through an image URL",
+    "date": "2026-04-07",
+    "system": "Grafana AI assistant",
+    "vendor": "Grafana Labs",
+    "affected": "Grafana deployments using AI features",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration",
+      "unsafe-output-handling"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "Hidden instructions in external content caused the assistant to render an attacker-controlled image, carrying enterprise data out in the URL's query parameters. Grafana patched it.",
+    "root_cause": "Model output could include arbitrary image URLs that the UI fetched automatically.",
+    "mitigations": [
+      "Restrict rendered images to an allowlist of owned domains; strip query strings."
+    ],
+    "sources": [
+      {
+        "title": "SecurityWeek",
+        "url": "https://www.securityweek.com/grafanaghost-attackers-can-abuse-grafana-to-leak-enterprise-data/"
+      }
+    ],
+    "file": "incidents/AP-0048-grafanaghost-image-exfiltration.yaml"
+  },
+  {
+    "id": "AP-0047",
+    "title": "Max-severity Flowise RCE through the CustomMCP node is exploited in the wild",
+    "date": "2026-04-07",
+    "system": "Flowise (CustomMCP node)",
+    "vendor": "FlowiseAI",
+    "affected": "Internet-exposed Flowise instances below 3.0.6",
+    "classes": [
+      "infra-vuln"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "CVE-2025-59528: Flowise evaluated user-supplied CustomMCP configuration as JavaScript, giving attackers remote code execution on the server. Months after the fix, attackers began mass exploitation of unpatched instances.",
+    "root_cause": "Configuration was parsed by evaluating code, and low-code AI builders were exposed to the internet without auth.",
+    "mitigations": [
+      "Parse configs as data (JSON), never with eval or Function().",
+      "Patch AI builder tools quickly; keep them behind authentication."
+    ],
+    "sources": [
+      {
+        "title": "BleepingComputer",
+        "url": "https://www.bleepingcomputer.com/news/security/max-severity-flowise-rce-vulnerability-now-exploited-in-attacks/"
+      }
+    ],
+    "file": "incidents/AP-0047-flowise-custommcp-rce-exploited.yaml"
+  },
+  {
+    "id": "AP-0046",
+    "title": "Coding agent deletes PocketOS's production database and backups in one API call",
+    "date": "2026-04",
+    "system": "Cursor (Claude Opus 4.6) + Railway API",
+    "vendor": "Cursor / Railway",
+    "affected": "PocketOS, a car-rental SaaS, and its customers",
+    "classes": [
+      "destructive-action",
+      "excessive-agency"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "Working on a routine staging task, the agent hit a credential mismatch and decided to \"fix\" it by deleting a Railway volume. The volume was shared with production, and the backups lived on the same volume. Production data and backups were gone in about nine seconds; the latest separate backup was three months old.",
+    "root_cause": "A CLI token with blanket permissions across environments, an API that allowed destructive actions without confirmation, backups co-located with the data they protect, and an agent that guessed scope instead of verifying it.",
+    "mitigations": [
+      "Issue environment-scoped tokens; staging credentials must not be able to touch prod.",
+      "Store backups in a separate failure domain the agent's credentials cannot reach.",
+      "Require human approval for any delete or destroy call against infrastructure APIs."
+    ],
+    "sources": [
+      {
+        "title": "Tom's Hardware",
+        "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/claude-powered-ai-coding-agent-deletes-entire-company-database-in-9-seconds-backups-zapped-after-cursor-tool-powered-by-anthropics-claude-goes-rogue"
+      },
+      {
+        "title": "ACS Information Age",
+        "url": "https://ia.acs.org.au/article/2026/gone-in-9-seconds--ai-agent-deletes-company-database.html"
+      }
+    ],
+    "file": "incidents/AP-0046-pocketos-database-deleted-in-9-seconds.yaml"
+  },
+  {
+    "id": "AP-0045",
+    "title": "Web forms hijack Salesforce Agentforce and Microsoft Copilot agents (PipeLeak / ShareLeak)",
+    "date": "2026-04",
+    "system": "Salesforce Agentforce, Microsoft Copilot (SharePoint)",
+    "vendor": "Salesforce / Microsoft",
+    "affected": "Organizations running agents over public lead and SharePoint forms",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "Capsule Security put one-line instructions into a public lead-capture form; Agentforce treated them as a trusted prompt and emailed CRM leads to the attacker. A similar SharePoint form attack on Copilot (CVE-2026-21520) exfiltrated customer data even when safety mechanisms flagged it.",
+    "root_cause": "Agent flows processed form inputs as instructions rather than untrusted data, with an email tool available in the same flow.",
+    "mitigations": [
+      "Disable outbound email tools in flows that process untrusted input.",
+      "Require human review before CRM data leaves the organization."
+    ],
+    "sources": [
+      {
+        "title": "Dark Reading",
+        "url": "https://www.darkreading.com/cloud-security/microsoft-salesforce-patch-ai-agent-data-leak-flaws"
+      }
+    ],
+    "file": "incidents/AP-0045-pipeleak-shareleak-form-injection.yaml"
+  },
+  {
+    "id": "AP-0044",
+    "title": "\"Double Agent\": deployed Vertex AI agents inherit service account rights and steal credentials",
+    "date": "2026-03-31",
+    "system": "Google Cloud Vertex AI Agent Engine and ADK",
+    "vendor": "Google Cloud",
+    "affected": "Vertex AI agent deployments using default permissions",
+    "classes": [
+      "excessive-agency",
+      "infra-vuln"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "Unit 42 showed that an agent deployed with default settings ran under a Google-managed service account whose inherited permissions let a manipulated agent extract credentials and reach restricted resources in the project.",
+    "root_cause": "Insecure defaults: agents got broad project permissions through a managed identity, instead of a per-agent least-privilege one.",
+    "mitigations": [
+      "Give every agent its own service account scoped to exactly the resources it needs.",
+      "Audit managed identities that agent platforms create on your behalf."
+    ],
+    "sources": [
+      {
+        "title": "Unit 42 (Palo Alto Networks)",
+        "url": "https://unit42.paloaltonetworks.com/double-agents-vertex-ai/"
+      },
+      {
+        "title": "SecurityWeek",
+        "url": "https://www.securityweek.com/google-addresses-vertex-security-issues-after-researchers-weaponize-ai-agent/"
+      }
+    ],
+    "file": "incidents/AP-0044-vertex-ai-double-agent.yaml"
+  },
+  {
+    "id": "AP-0043",
+    "title": "Claude Code npm release ships a source map, and attackers use \"leaked source\" repos as malware lures",
+    "date": "2026-03-31",
+    "system": "Claude Code (@anthropic-ai/claude-code)",
+    "vendor": "Anthropic",
+    "affected": "Anthropic; developers who downloaded fake \"leaked\" builds",
+    "classes": [
+      "supply-chain"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "A published npm release included a source map exposing internal source code. Within days, threat actors created fake repositories and releases claiming to contain the leaked code, which instead delivered malware.",
+    "root_cause": "The release pipeline didn't check package contents for debug artifacts before publishing.",
+    "mitigations": [
+      "Fail the release if the package tarball contains source maps or unexpected files.",
+      "Install AI tools only from official registries and signed releases."
+    ],
+    "sources": [
+      {
+        "title": "Zscaler ThreatLabz",
+        "url": "https://www.zscaler.com/blogs/security-research/anthropic-claude-code-leak"
+      }
+    ],
+    "file": "incidents/AP-0043-claude-code-source-map-leak-lures.yaml"
+  },
+  {
+    "id": "AP-0042",
+    "title": "Malicious LiteLLM releases on PyPI steal credentials; Mercor breach follows",
+    "date": "2026-03-24",
+    "system": "LiteLLM (PyPI)",
+    "vendor": "BerriAI (LiteLLM)",
+    "affected": "LiteLLM users, including AI training-data vendor Mercor",
+    "classes": [
+      "supply-chain",
+      "data-exfiltration"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "Attackers published backdoored versions of LiteLLM, the popular LLM proxy library, that stole credentials from the machines that installed them. Mercor confirmed it was compromised, and Meta paused work with Mercor over the exposure of training-data work.",
+    "root_cause": "A compromised publishing path for a library that, by design, sits next to every LLM API key in an organization.",
+    "mitigations": [
+      "Pin and hash-lock AI gateway dependencies; use trusted publishing on PyPI.",
+      "Keep provider keys in a secrets manager, not in the proxy host's environment."
+    ],
+    "sources": [
+      {
+        "title": "WIRED",
+        "url": "https://www.wired.com/story/meta-pauses-work-with-mercor-after-data-breach-puts-ai-industry-secrets-at-risk/"
+      },
+      {
+        "title": "PyPI Stats blog",
+        "url": "https://pypistats.com/blog/litellm-pypi-supply-chain-compromise-how-a-popular-llm-proxy-became-a-credential-stealing-backdoor-march-24-2026"
+      }
+    ],
+    "file": "incidents/AP-0042-litellm-pypi-compromise-mercor.yaml"
+  },
+  {
+    "id": "AP-0041",
+    "title": "Meta engineer follows an internal AI agent's advice and exposes sensitive data for two hours",
+    "date": "2026-03-20",
+    "system": "Meta internal AI agent",
+    "vendor": "Meta",
+    "affected": "Meta users and internal data",
+    "classes": [
+      "hallucination",
+      "isolation-failure"
+    ],
+    "severity": "high",
+    "status": "in-the-wild",
+    "summary": "An employee implemented flawed engineering guidance from an internal agent. The change made a large amount of sensitive user and company data visible to engineers who shouldn't have had access, for about two hours.",
+    "root_cause": "Agent advice on access-control changes was applied without the review a human-authored change would get.",
+    "mitigations": [
+      "Route agent-suggested changes to permissions and data access through normal security review."
+    ],
+    "sources": [
+      {
+        "title": "The Guardian",
+        "url": "https://www.theguardian.com/technology/2026/mar/20/meta-ai-agents-instruction-causes-large-sensitive-data-leak-to-employees"
+      }
+    ],
+    "file": "incidents/AP-0041-meta-internal-agent-data-exposure.yaml"
+  },
+  {
+    "id": "AP-0040",
+    "title": "Attacker uses Claude to automate a breach of Mexican government agencies",
+    "date": "2026-02-25",
+    "system": "Claude (and at times ChatGPT)",
+    "vendor": "Anthropic / OpenAI",
+    "affected": "Mexican government agencies (about 150 GB of data)",
+    "classes": [
+      "misuse"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "Bloomberg reported that a hacker used Claude to automate reconnaissance and exploit development against Mexican government systems between late December 2025 and January 2026, exposing about 150 GB of sensitive data.",
+    "root_cause": "General-purpose coding agents can be steered through offensive work split into innocuous-looking steps.",
+    "mitigations": [
+      "For defenders, assume attacker speed has increased; patch internet-facing systems faster.",
+      "For providers, detect offensive usage patterns across sessions, not per prompt."
+    ],
+    "sources": [
+      {
+        "title": "Bloomberg",
+        "url": "https://www.bloomberg.com/news/articles/2026-02-25/hacker-used-anthropic-s-claude-to-steal-sensitive-mexican-data"
+      }
+    ],
+    "file": "incidents/AP-0040-mexico-government-claude-assisted-breach.yaml"
+  },
+  {
+    "id": "AP-0039",
+    "title": "OpenClaw agent deletes a Meta AI safety director's inbox and ignores stop commands",
+    "date": "2026-02-23",
+    "system": "OpenClaw (personal AI agent)",
+    "vendor": "OpenClaw open-source project",
+    "affected": "Summer Yue, Meta's director of alignment",
+    "classes": [
+      "destructive-action",
+      "excessive-agency"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "Asked to suggest emails to archive or delete, the agent started deleting messages directly in a rapid \"speed run\". Stop commands sent from her phone were ignored, and she had to physically run to the machine hosting the agent to kill it.",
+    "root_cause": "The agent had full delete rights on the mailbox and no reliable kill switch; \"suggest\" was only a prompt-level constraint.",
+    "mitigations": [
+      "Give \"suggest\" tasks read-only credentials; enforce action modes in code.",
+      "Build an out-of-band kill switch that stops tool execution immediately."
+    ],
+    "sources": [
+      {
+        "title": "TechCrunch",
+        "url": "https://techcrunch.com/2026/02/23/a-meta-ai-security-researcher-said-an-openclaw-agent-ran-amok-on-her-inbox/"
+      }
+    ],
+    "file": "incidents/AP-0039-openclaw-inbox-deletion.yaml"
+  },
+  {
+    "id": "AP-0038",
+    "title": "Google Antigravity agent wipes a user's entire D drive while clearing a cache",
+    "date": "2025-11",
+    "system": "Google Antigravity (agentic IDE)",
+    "vendor": "Google",
+    "affected": "Individual developer",
+    "classes": [
+      "destructive-action"
+    ],
+    "severity": "high",
+    "status": "in-the-wild",
+    "summary": "Asked to clear a project cache, the agent ran a recursive delete that targeted the root of the user's D drive instead of the project folder, in \"Turbo\" mode that executes commands without confirmation. The data was not recoverable.",
+    "root_cause": "Auto-execution was enabled for shell commands with no path allowlist, and the agent built a delete path without validating it stayed inside the workspace.",
+    "mitigations": [
+      "Block recursive deletes outside the workspace root at the tool layer.",
+      "Keep \"auto-run\" modes off for destructive commands regardless of user settings."
+    ],
+    "sources": [
+      {
+        "title": "The Register",
+        "url": "https://www.theregister.com/2025/12/01/google_antigravity_wipes_d_drive/"
+      },
+      {
+        "title": "Tom's Hardware",
+        "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/googles-agentic-ai-wipes-users-entire-hard-drive-without-permission-after-misinterpreting-instructions-to-clear-a-cache-i-am-deeply-deeply-sorry-this-is-a-critical-failure-on-my-part"
+      }
+    ],
+    "file": "incidents/AP-0038-antigravity-wipes-d-drive.yaml"
+  },
+  {
+    "id": "AP-0037",
+    "title": "CamoLeak, private source code leaking from GitHub Copilot Chat via image proxy URLs",
+    "date": "2025-10-08",
+    "system": "GitHub Copilot Chat",
+    "vendor": "GitHub",
+    "affected": "Users asking Copilot about pull requests from untrusted authors",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration",
+      "unsafe-output-handling"
+    ],
+    "severity": "critical",
+    "status": "research",
+    "summary": "Legit Security hid a prompt in an invisible markdown comment in a PR description. When the victim asked Copilot Chat about the PR, Copilot searched the victim's private repos for secrets and encoded them character by character as a sequence of pre-signed Camo image URLs, bypassing CSP. GitHub fixed it by disabling image rendering in Copilot Chat.",
+    "root_cause": "Hidden content in PRs reached the model, and the chat rendered images through a proxy that the attacker could pre-sign a dictionary of URLs for.",
+    "mitigations": [
+      "Strip hidden markdown and HTML comments from context, or show them to the user.",
+      "Disable image rendering in chat responses that touch private data."
+    ],
+    "sources": [
+      {
+        "title": "Legit Security",
+        "url": "https://www.legitsecurity.com/blog/camoleak-critical-github-copilot-vulnerability-leaks-private-source-code"
+      },
+      {
+        "title": "The Register",
+        "url": "https://theregister.com/2025/10/09/github_copilot_chat_vulnerability/"
+      }
+    ],
+    "file": "incidents/AP-0037-camoleak-copilot-chat-private-code.yaml"
+  },
+  {
+    "id": "AP-0036",
+    "title": "Deloitte refunds part of an A$440,000 government report after AI-fabricated citations",
+    "date": "2025-10",
+    "system": "Azure OpenAI GPT-4o (used in report drafting)",
+    "vendor": "Deloitte Australia",
+    "affected": "Australian Department of Employment and Workplace Relations",
+    "classes": [
+      "hallucination"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "A university researcher found fabricated references and a made-up court quote in a Deloitte review of a welfare compliance system. Deloitte reissued the report, disclosed that generative AI was used, and agreed to refund the final contract payment.",
+    "root_cause": "Generated citations went into a deliverable without anyone checking that each one existed.",
+    "mitigations": [
+      "Automatically verify every citation against a source database before delivery.",
+      "Disclose AI use in client deliverables."
+    ],
+    "sources": [
+      {
+        "title": "The Register",
+        "url": "https://www.theregister.com/2025/10/06/deloitte_ai_report_australia/"
+      }
+    ],
+    "file": "incidents/AP-0036-deloitte-refund-ai-fabricated-citations.yaml"
+  },
+  {
+    "id": "AP-0035",
+    "title": "ForcedLeak, CRM data leaking from Agentforce through an expired allowlisted domain",
+    "date": "2025-09-25",
+    "system": "Salesforce Agentforce (Web-to-Lead)",
+    "vendor": "Salesforce",
+    "affected": "Agentforce customers using Web-to-Lead",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration",
+      "unsafe-output-handling"
+    ],
+    "severity": "critical",
+    "status": "research",
+    "summary": "Noma Security hid instructions in a Web-to-Lead form field. When an employee later asked Agentforce about the lead, the agent pulled CRM data and embedded it in an image URL on a domain that was still on Salesforce's CSP allowlist but had expired, and the researchers bought it for $5.",
+    "root_cause": "Untrusted lead text reached a privileged agent, and the output renderer trusted an allowlist that contained a stale domain.",
+    "mitigations": [
+      "Audit CSP and URL allowlists for expired domains; prefer a short, owned list.",
+      "Enforce trusted-URL checks on all model-generated links and images."
+    ],
+    "sources": [
+      {
+        "title": "The Hacker News",
+        "url": "https://thehackernews.com/2025/09/salesforce-patches-critical-forcedleak.html"
+      },
+      {
+        "title": "The Register",
+        "url": "https://www.theregister.com/2025/09/26/salesforce_agentforce_forceleak_attack/"
+      }
+    ],
+    "file": "incidents/AP-0035-forcedleak-agentforce-expired-domain.yaml"
+  },
+  {
+    "id": "AP-0034",
+    "title": "First malicious MCP server in the wild silently BCCs every email (\"postmark-mcp\")",
+    "date": "2025-09",
+    "system": "postmark-mcp (npm)",
+    "vendor": "Impersonated Postmark integration",
+    "affected": "Users who installed the package (about 1,500 weekly downloads)",
+    "classes": [
+      "supply-chain",
+      "tool-poisoning",
+      "data-exfiltration"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "An npm package imitating a Postmark email MCP server behaved normally for 15 versions, then version 1.0.16 added one line that BCC'd every outgoing email (invoices, password resets, internal memos) to an attacker-controlled address.",
+    "root_cause": "MCP servers are installed from public registries with no provenance, pinned versions or runtime monitoring of what they actually send.",
+    "mitigations": [
+      "Pin MCP server versions and review diffs on upgrade; prefer vendor-published servers.",
+      "Monitor outbound traffic and arguments of tools that send data externally."
+    ],
+    "sources": [
+      {
+        "title": "The Hacker News",
+        "url": "https://thehackernews.com/2025/09/first-malicious-mcp-server-found.html"
+      },
+      {
+        "title": "The Register",
+        "url": "https://www.theregister.com/2025/09/29/postmark_mcp_server_code_hijacked/"
+      }
+    ],
+    "file": "incidents/AP-0034-postmark-mcp-bcc-backdoor.yaml"
+  },
+  {
+    "id": "AP-0033",
+    "title": "Malicious Nx packages use local AI CLIs to hunt for secrets (\"s1ngularity\")",
+    "date": "2025-08-26",
+    "system": "Nx build system npm packages",
+    "vendor": "Nx (Nrwl)",
+    "affected": "Thousands of developers and CI machines",
+    "classes": [
+      "supply-chain",
+      "misuse",
+      "data-exfiltration"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "Compromised Nx releases ran a post-install script that invoked Claude Code, Gemini CLI and Amazon Q with permission-skipping flags and a prompt to search the disk for wallets, keys and tokens. Results were uploaded to public GitHub repos created in the victim's own account.",
+    "root_cause": "A vulnerable GitHub Actions workflow leaked the npm publish token. Once inside, the malware found locally installed AI CLIs that could be run fully unattended with broad file access.",
+    "mitigations": [
+      "Use trusted publishing (OIDC) and provenance for npm releases; disable risky workflow triggers.",
+      "Do not leave \"dangerously skip permissions\" style flags usable without an interactive user.",
+      "Block install scripts by default in CI and on dev machines."
+    ],
+    "sources": [
+      {
+        "title": "Nx security advisory GHSA-cxm3-wv7p-598c",
+        "url": "https://github.com/nrwl/nx/security/advisories/GHSA-cxm3-wv7p-598c"
+      },
+      {
+        "title": "Apiiro analysis",
+        "url": "https://apiiro.com/blog/nx-supply-chain-breach-shows-why-malicious-package-detection-matters"
+      }
+    ],
+    "file": "incidents/AP-0033-nx-s1ngularity-weaponizes-ai-clis.yaml"
+  },
+  {
+    "id": "AP-0032",
+    "title": "Google Calendar invites hijack Gemini to control smart-home devices",
+    "date": "2025-08",
+    "system": "Gemini (Workspace and Google Home integrations)",
+    "vendor": "Google",
+    "affected": "Gemini users with connected apps",
+    "classes": [
+      "prompt-injection",
+      "excessive-agency"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "SafeBreach researchers (\"Invitation Is All You Need\") put instructions in calendar invite titles. When the victim later asked Gemini about their schedule, the delayed instructions triggered actions such as opening windows, turning on a boiler, sending spam and starting video calls.",
+    "root_cause": "Content from any calendar inviter reached an assistant that could invoke physical-world and communication tools.",
+    "mitigations": [
+      "Require confirmation for actions with physical or external effects.",
+      "Treat third-party calendar and email content as untrusted data with no tool authority."
+    ],
+    "sources": [
+      {
+        "title": "The Decoder",
+        "url": "https://the-decoder.com/attackers-can-hijack-google-gemini-with-a-simple-prompt-hidden-in-a-calendar-invite/"
+      },
+      {
+        "title": "Bitdefender",
+        "url": "https://www.bitdefender.com/en-us/blog/hotforsecurity/gemini-ai-compromised-through-malicious-calendar-invites-researchers-warn"
+      }
+    ],
+    "file": "incidents/AP-0032-gemini-calendar-invite-hijack.yaml"
+  },
+  {
+    "id": "AP-0031",
+    "title": "Cursor runs attacker-edited MCP configs (CurXecute and MCPoison)",
+    "date": "2025-08",
+    "system": "Cursor IDE",
+    "vendor": "Anysphere",
+    "affected": "Cursor users before 1.3",
+    "classes": [
+      "prompt-injection",
+      "tool-poisoning",
+      "infra-vuln"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "CurXecute (CVE-2025-54135): a prompt injection, for example a Slack message read via MCP, made the agent write a new entry into ~/.cursor/mcp.json, which Cursor started immediately, giving remote code execution. MCPoison (CVE-2025-54136): once a user approved a project MCP config, an attacker could swap its command in the repo and Cursor would run it without asking again.",
+    "root_cause": "Config edits by the agent took effect without approval, and approval was bound to the server name, not to the command it runs.",
+    "mitigations": [
+      "Require re-approval whenever an MCP config entry changes; bind approval to a hash of the command.",
+      "Disallow the agent from writing its own tool configuration."
+    ],
+    "sources": [
+      {
+        "title": "Tenable FAQ",
+        "url": "https://www.tenablecloud.cn/blog/faq-cve-2025-54135-cve-2025-54136-vulnerabilities-in-cursor-curxecute-mcpoison"
+      },
+      {
+        "title": "Check Point Research",
+        "url": "https://research.checkpoint.com/2025/cursor-vulnerability-mcpoison/"
+      }
+    ],
+    "file": "incidents/AP-0031-cursor-curxecute-mcpoison.yaml"
+  },
+  {
+    "id": "AP-0030",
+    "title": "Perplexity Comet follows instructions hidden in a Reddit comment and leaks the user's account",
+    "date": "2025-08",
+    "system": "Perplexity Comet (agentic browser)",
+    "vendor": "Perplexity",
+    "affected": "Comet users summarizing untrusted pages",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration",
+      "excessive-agency"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "Brave researchers hid instructions in a Reddit comment. When the user asked Comet to summarize the page, the agent navigated to the user's Perplexity account, read their email and a one-time password from Gmail, and posted both back in a reply.",
+    "root_cause": "The browser agent acted with the user's full authenticated sessions on every site, while treating page content as instructions.",
+    "mitigations": [
+      "Separate untrusted page content from user instructions, and require confirmation for cross-site actions.",
+      "Run agentic browsing in a profile without the user's logged-in sessions by default."
+    ],
+    "sources": [
+      {
+        "title": "Brave",
+        "url": "https://brave.com/blog/comet-prompt-injection/"
+      },
+      {
+        "title": "The Decoder",
+        "url": "https://the-decoder.com/brave-discovers-a-security-flaw-in-perplexitys-comet-browser/"
+      }
+    ],
+    "file": "incidents/AP-0030-comet-browser-indirect-injection.yaml"
+  },
+  {
+    "id": "AP-0029",
+    "title": "Wiper prompt merged into Amazon Q Developer's VS Code extension and shipped",
+    "date": "2025-07-23",
+    "system": "Amazon Q Developer extension for VS Code (v1.84.0)",
+    "vendor": "AWS",
+    "affected": "Extension users (nearly a million installs)",
+    "classes": [
+      "supply-chain",
+      "prompt-injection",
+      "destructive-action"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "An attacker got a pull request into the extension's open-source repository that added a system prompt telling the agent to \"clean a system to a near factory state\" and delete file-system and cloud resources. The compromised version was published to the marketplace. A formatting error reportedly kept the payload from executing.",
+    "root_cause": "Weak contributor and release controls on the extension repo let an outsider change the agent's instructions, and nothing reviewed prompt changes as security-sensitive code.",
+    "mitigations": [
+      "Treat prompts and agent configs as code, and require review and signed releases for changes.",
+      "Restrict destructive cloud and file-system tools behind explicit user confirmation."
+    ],
+    "sources": [
+      {
+        "title": "Tom's Hardware",
+        "url": "https://www.tomshardware.com/tech-industry/cyber-security/hacker-injects-malicious-potentially-disk-wiping-prompt-into-amazons-ai-coding-assistant-with-a-simple-pull-request-told-your-goal-is-to-clean-a-system-to-a-near-factory-state-and-delete-file-system-and-cloud-resources"
+      },
+      {
+        "title": "AWS security bulletin AWS-2025-015",
+        "url": "https://aws.amazon.com/security/security-bulletins/AWS-2025-015/"
+      }
+    ],
+    "file": "incidents/AP-0029-amazon-q-extension-wiper-prompt.yaml"
+  },
+  {
+    "id": "AP-0028",
+    "title": "Replit Agent deletes a production database during a code freeze, then misreports it",
+    "date": "2025-07-18",
+    "system": "Replit Agent",
+    "vendor": "Replit",
+    "affected": "SaaStr (Jason Lemkin's vibe-coding project)",
+    "classes": [
+      "destructive-action",
+      "excessive-agency"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "During a multi-day vibe-coding experiment, Replit's agent ran destructive commands against the production database while an explicit code and action freeze was in place, wiping records for over a thousand executives and companies. It then told the user a rollback was impossible, which turned out to be wrong.",
+    "root_cause": "The agent had write access to production from the same environment it developed in. The \"freeze\" existed only as a natural-language instruction, with nothing in the platform enforcing it.",
+    "mitigations": [
+      "Separate dev and prod databases; never give a coding agent prod credentials by default.",
+      "Enforce freezes in the platform (read-only mode, planning-only mode), not in the prompt.",
+      "Keep restorable backups the agent itself cannot delete, and verify an agent's claims about recovery."
+    ],
+    "sources": [
+      {
+        "title": "Fortune",
+        "url": "https://fortune.com/2025/07/23/ai-coding-tool-replit-wiped-database-called-it-a-catastrophic-failure/"
+      },
+      {
+        "title": "heise online",
+        "url": "https://heise.de/-10499597"
+      }
+    ],
+    "file": "incidents/AP-0028-replit-agent-deletes-saastr-production-db.yaml"
+  },
+  {
+    "id": "AP-0027",
+    "title": "McDonald's AI hiring bot backend exposes 64 million applicant records behind \"123456\"",
+    "date": "2025-07-09",
+    "system": "McHire (Paradox.ai \"Olivia\")",
+    "vendor": "Paradox.ai",
+    "affected": "Up to 64 million job applicants",
+    "classes": [
+      "infra-vuln"
+    ],
+    "severity": "high",
+    "status": "in-the-wild",
+    "summary": "Security researchers Ian Carroll and Sam Curry logged into an old Paradox.ai test admin account with the username and password \"123456\", then used an insecure direct object reference to access chat histories and personal details of applicants. Paradox fixed it the same day.",
+    "root_cause": "Classic web security failures (default credentials, no MFA, IDOR) around an AI product, not the model.",
+    "mitigations": [
+      "Decommission test accounts; require SSO and MFA on admin panels.",
+      "Authorization checks on every record ID; AI products need the same appsec as any app."
+    ],
+    "sources": [
+      {
+        "title": "BleepingComputer",
+        "url": "https://www.bleepingcomputer.com/news/security/123456-password-exposed-chats-for-64-million-mcdonalds-job-chatbot-applications/"
+      },
+      {
+        "title": "Ian Carroll",
+        "url": "https://ian.sh/mcdonalds"
+      }
+    ],
+    "file": "incidents/AP-0027-mchire-123456-applicant-data.yaml"
+  },
+  {
+    "id": "AP-0026",
+    "title": "Support ticket makes a Cursor agent dump a Supabase database through MCP",
+    "date": "2025-07",
+    "system": "Supabase MCP server + Cursor",
+    "vendor": "Supabase",
+    "affected": "Apps whose developers ran the MCP server with the service_role key",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration",
+      "excessive-agency"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "A customer-submitted support ticket contained instructions aimed at the developer's agent. When the developer asked Cursor to review open tickets, the agent, connected via the Supabase MCP server with the service_role key, read the integration_tokens table and wrote it back into the ticket thread.",
+    "root_cause": "service_role bypasses row-level security, and untrusted user content was fed to an agent that had both full database read and write-back capability.",
+    "mitigations": [
+      "Run database MCP servers read-only and with least-privilege roles, never service_role.",
+      "Wrap untrusted rows as data, and flag instruction-like content before the model sees it."
+    ],
+    "sources": [
+      {
+        "title": "Simon Willison",
+        "url": "https://simonwillison.net/2025/Jul/6/supabase-mcp-lethal-trifecta/"
+      }
+    ],
+    "file": "incidents/AP-0026-supabase-mcp-support-ticket-leak.yaml"
+  },
+  {
+    "id": "AP-0025",
+    "title": "Malicious MCP server gets OS command execution through mcp-remote (CVE-2025-6514)",
+    "date": "2025-07",
+    "system": "mcp-remote (npm)",
+    "vendor": "Open-source project",
+    "affected": "Clients using mcp-remote 0.0.5 to 0.1.15 to reach remote servers",
+    "classes": [
+      "infra-vuln",
+      "tool-poisoning"
+    ],
+    "severity": "critical",
+    "status": "research",
+    "summary": "JFrog found that mcp-remote passed the authorization_endpoint from a remote server's OAuth metadata straight to the system's URL opener. A malicious server could return a crafted URL and run arbitrary commands on the client machine when connecting.",
+    "root_cause": "Server-supplied OAuth metadata was trusted and passed to a shell-like opener without validation.",
+    "mitigations": [
+      "Validate URLs from remote servers (https scheme only) before opening them.",
+      "Connect only to trusted remote MCP servers over HTTPS, and keep mcp-remote updated."
+    ],
+    "sources": [
+      {
+        "title": "JFrog Security Research",
+        "url": "https://research.jfrog.com/vulnerabilities/mcp-remote-command-injection-rce-jfsa-2025-001290844/"
+      }
+    ],
+    "file": "incidents/AP-0025-mcp-remote-command-injection.yaml"
+  },
+  {
+    "id": "AP-0024",
+    "title": "Browser-based RCE in Anthropic's MCP Inspector developer tool (CVE-2025-49596)",
+    "date": "2025-07",
+    "system": "MCP Inspector",
+    "vendor": "Anthropic",
+    "affected": "Developers running MCP Inspector below 0.14.1",
+    "classes": [
+      "infra-vuln"
+    ],
+    "severity": "critical",
+    "status": "research",
+    "summary": "MCP Inspector's local proxy listened without authentication. Oligo showed that a malicious web page could reach it from the browser (the \"0.0.0.0 day\" plus CSRF) and launch arbitrary commands on the developer's machine. Fixed in 0.14.1 with session tokens and origin checks.",
+    "root_cause": "A local dev server trusted every request from localhost and exposed process spawning.",
+    "mitigations": [
+      "Bind local tools to 127.0.0.1 with auth tokens and Origin checks.",
+      "Never expose process-spawning endpoints without authentication, even locally."
+    ],
+    "sources": [
+      {
+        "title": "Oligo Security",
+        "url": "https://www.oligo.security/blog/critical-rce-vulnerability-in-anthropic-mcp-inspector-cve-2025-49596"
+      },
+      {
+        "title": "The Hacker News",
+        "url": "https://thehackernews.com/2025/07/critical-vulnerability-in-anthropics.html"
+      }
+    ],
+    "file": "incidents/AP-0024-mcp-inspector-browser-rce.yaml"
+  },
+  {
+    "id": "AP-0023",
+    "title": "Gemini CLI loses a user's files after acting on a mkdir that never succeeded",
+    "date": "2025-07",
+    "system": "Gemini CLI",
+    "vendor": "Google",
+    "affected": "Individual developer",
+    "classes": [
+      "destructive-action"
+    ],
+    "severity": "high",
+    "status": "in-the-wild",
+    "summary": "Asked to rename and move a folder, Gemini CLI issued a mkdir that silently failed, then ran move commands into the non-existent directory. Each move overwrote the previous file, destroying the data. The agent concluded \"I have failed you completely and catastrophically.\"",
+    "root_cause": "The agent never verified the result of a state-changing command (read-after-write) and kept building on a hallucinated file-system state.",
+    "mitigations": [
+      "Check exit codes and re-read state after every file-system mutation.",
+      "Run agents in a git-tracked or snapshotted workspace so moves and deletes are reversible."
+    ],
+    "sources": [
+      {
+        "title": "Ars Technica",
+        "url": "https://arstechnica.com/information-technology/2025/07/ai-coding-assistants-chase-phantoms-destroy-real-user-data/"
+      }
+    ],
+    "file": "incidents/AP-0023-gemini-cli-deletes-user-files.yaml"
+  },
+  {
+    "id": "AP-0022",
+    "title": "EchoLeak, a zero-click data exfiltration from Microsoft 365 Copilot via one email",
+    "date": "2025-06-11",
+    "system": "Microsoft 365 Copilot",
+    "vendor": "Microsoft",
+    "affected": "M365 Copilot tenants (patched server-side, CVE-2025-32711)",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration",
+      "unsafe-output-handling"
+    ],
+    "severity": "critical",
+    "status": "research",
+    "summary": "Aim Security sent an email whose text, phrased as instructions to the recipient, was later retrieved by Copilot as context. It made Copilot embed sensitive data from the user's mailbox and files into a reference-style markdown image URL that was fetched automatically through an allowed Microsoft domain.",
+    "root_cause": "Retrieval mixed attacker-controlled email with privileged data, and the client rendered model-generated links and images without stripping data-bearing URLs.",
+    "mitigations": [
+      "Do not auto-render images or links from model output to arbitrary URLs; strict CSP.",
+      "Label retrieved content by trust level and keep external content away from sensitive scopes."
+    ],
+    "sources": [
+      {
+        "title": "The Hacker News",
+        "url": "https://thehackernews.com/2025/06/zero-click-ai-vulnerability-exposes.html"
+      },
+      {
+        "title": "SecurityWeek",
+        "url": "https://securityweek.com/echoleak-ai-attack-enabled-theft-of-sensitive-data-via-microsoft-365-copilot/"
+      }
+    ],
+    "file": "incidents/AP-0022-echoleak-m365-copilot-zero-click.yaml"
+  },
+  {
+    "id": "AP-0021",
+    "title": "Asana's MCP server exposes data across customer organizations",
+    "date": "2025-06",
+    "system": "Asana MCP server",
+    "vendor": "Asana",
+    "affected": "About 1,000 customer organizations",
+    "classes": [
+      "isolation-failure",
+      "infra-vuln"
+    ],
+    "severity": "high",
+    "status": "in-the-wild",
+    "summary": "A logic flaw in Asana's newly launched MCP server let users in one organization see project and task data from other organizations through AI integrations, for about a month. Asana took the server offline, fixed it and notified affected customers.",
+    "root_cause": "A tenant isolation bug in the MCP layer, which was a new access path that bypassed the checks the main product enforced.",
+    "mitigations": [
+      "Treat MCP endpoints as new public APIs; run the same tenant-isolation tests as the main product.",
+      "Log which tenant's data each tool call returns and alert on cross-tenant reads."
+    ],
+    "sources": [
+      {
+        "title": "BleepingComputer",
+        "url": "https://www.bleepingcomputer.com/news/security/asana-warns-mcp-ai-feature-exposed-customer-data-to-other-orgs/"
+      },
+      {
+        "title": "The Register",
+        "url": "https://theregister.com/2025/06/18/asana_mcp_server_bug/"
+      }
+    ],
+    "file": "incidents/AP-0021-asana-mcp-cross-tenant-exposure.yaml"
+  },
+  {
+    "id": "AP-0020",
+    "title": "Public GitHub issue makes an agent leak private repos through the GitHub MCP server",
+    "date": "2025-05-26",
+    "system": "GitHub MCP server + coding agents",
+    "vendor": "GitHub",
+    "affected": "Any user connecting an agent to the GitHub MCP server with broad tokens",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration",
+      "excessive-agency"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "Invariant Labs showed that a malicious issue in a public repository could instruct an agent that was asked to \"look at the open issues\" to read the user's private repositories and publish their contents in a pull request on the public repo.",
+    "root_cause": "One token gave the agent access to both public (attacker-controlled) and private data, plus a public write channel. That is the \"lethal trifecta\": private data, untrusted content and exfiltration.",
+    "mitigations": [
+      "Scope tokens per task; one repository per session where possible.",
+      "Treat issue and PR text as untrusted data and gate cross-repo writes behind confirmation."
+    ],
+    "sources": [
+      {
+        "title": "Invariant Labs",
+        "url": "https://invariantlabs.ai/blog/mcp-github-vulnerability"
+      },
+      {
+        "title": "DevClass",
+        "url": "https://devclass.com/2025/05/27/researchers-warn-of-prompt-injection-vulnerability-in-github-mcp-with-no-obvious-fix/"
+      }
+    ],
+    "file": "incidents/AP-0020-github-mcp-toxic-agent-flow.yaml"
+  },
+  {
+    "id": "AP-0019",
+    "title": "OpenAI rolls back a GPT-4o update that made ChatGPT sycophantic",
+    "date": "2025-04-29",
+    "system": "ChatGPT (GPT-4o)",
+    "vendor": "OpenAI",
+    "affected": "ChatGPT users",
+    "classes": [
+      "model-behavior"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "An update tuned on short-term user feedback made the model validate whatever users said, including harmful decisions and delusions. OpenAI rolled it back within days and published a postmortem on how offline evals and A/B tests missed it.",
+    "root_cause": "A new reward signal from thumbs-up/down feedback outweighed other signals, and no eval measured sycophancy before launch.",
+    "mitigations": [
+      "Add behavior evals (sycophancy, agreement with false claims) as launch-blocking checks.",
+      "Treat qualitative \"vibe\" concerns from expert testers as blockers, not notes."
+    ],
+    "sources": [
+      {
+        "title": "OpenAI",
+        "url": "https://openai.com/index/sycophancy-in-gpt-4o/"
+      },
+      {
+        "title": "VentureBeat",
+        "url": "https://venturebeat.com/ai/openai-rolls-back-chatgpts-sycophancy-and-explains-what-went-wrong"
+      }
+    ],
+    "file": "incidents/AP-0019-gpt-4o-sycophancy-rollback.yaml"
+  },
+  {
+    "id": "AP-0018",
+    "title": "Poisoned MCP server exfiltrates a user's WhatsApp history through a second server",
+    "date": "2025-04",
+    "system": "whatsapp-mcp + MCP clients",
+    "vendor": "Community MCP server",
+    "affected": "Users running WhatsApp MCP next to untrusted servers",
+    "classes": [
+      "tool-poisoning",
+      "data-exfiltration"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "A malicious \"sleeper\" MCP server changed its tool description after install and instructed the agent to use the trusted WhatsApp MCP server to send the user's message history to an attacker number, hidden off-screen with whitespace padding.",
+    "root_cause": "Tools from different servers share one model context, so one untrusted server can steer calls to another trusted server (cross-server shadowing).",
+    "mitigations": [
+      "Isolate servers from each other; require confirmation on outbound message tools.",
+      "Pin tool descriptions and flag post-install changes."
+    ],
+    "sources": [
+      {
+        "title": "Invariant Labs",
+        "url": "https://invariantlabs.ai/blog/whatsapp-mcp-exploited"
+      },
+      {
+        "title": "Docker blog",
+        "url": "https://www.docker.com/blog/mcp-horror-stories-whatsapp-data-exfiltration-issue/"
+      }
+    ],
+    "file": "incidents/AP-0018-whatsapp-mcp-history-exfiltration.yaml"
+  },
+  {
+    "id": "AP-0017",
+    "title": "MCP tool poisoning, where hidden instructions live in tool descriptions",
+    "date": "2025-04",
+    "system": "MCP clients (Cursor, Claude Desktop and others)",
+    "vendor": "Model Context Protocol ecosystem",
+    "affected": "Any MCP user installing third-party servers",
+    "classes": [
+      "tool-poisoning",
+      "data-exfiltration"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "Invariant Labs demonstrated MCP servers whose tool descriptions contain instructions the user never sees but the model follows, for example to read ~/.ssh keys or mcp.json and smuggle them out through a tool argument. A server can also change its descriptions after approval (\"rug pull\").",
+    "root_cause": "Clients pass full tool metadata into model context but show users a shortened version, and don't pin descriptions after the user approves a server.",
+    "mitigations": [
+      "Show the full tool description to users and pin a hash of it; alert on changes.",
+      "Scan tool metadata for instruction-like content before exposing it to the model."
+    ],
+    "sources": [
+      {
+        "title": "Invariant Labs",
+        "url": "https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks"
+      },
+      {
+        "title": "Simon Willison",
+        "url": "https://simonwillison.net/2025/Apr/9/mcp-prompt-injection/"
+      }
+    ],
+    "file": "incidents/AP-0017-mcp-tool-poisoning-disclosure.yaml"
+  },
+  {
+    "id": "AP-0016",
+    "title": "Cursor's AI support agent invents a \"one device\" policy and triggers cancellations",
+    "date": "2025-04",
+    "system": "Cursor support email agent (\"Sam\")",
+    "vendor": "Anysphere",
+    "affected": "Cursor users and the company's reputation",
+    "classes": [
+      "hallucination"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "Users were being logged out when switching machines because of a bug. The AI support agent told them this was a new policy limiting subscriptions to one device. The policy did not exist; the answer spread on Reddit and Hacker News and users cancelled before the company corrected it.",
+    "root_cause": "An unlabeled AI agent answered support questions without grounding, and had no \"I don't know\" path.",
+    "mitigations": [
+      "Label AI support replies as AI and escalate unknown causes to humans.",
+      "Restrict policy statements to retrieved, approved text."
+    ],
+    "sources": [
+      {
+        "title": "Fortune",
+        "url": "https://fortune.com/article/customer-support-ai-cursor-went-rogue/"
+      }
+    ],
+    "file": "incidents/AP-0016-cursor-support-bot-invents-policy.yaml"
+  },
+  {
+    "id": "AP-0015",
+    "title": "Rules File Backdoor, hidden Unicode in config files makes Copilot and Cursor write malicious code",
+    "date": "2025-03-18",
+    "system": "GitHub Copilot, Cursor",
+    "vendor": "GitHub / Anysphere",
+    "affected": "Projects consuming shared rules files",
+    "classes": [
+      "supply-chain",
+      "prompt-injection"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "Pillar Security hid instructions in AI rules files (.cursorrules and Copilot instructions) using invisible Unicode characters. The assistants followed them and inserted backdoored code, while the instructions told them not to mention the change.",
+    "root_cause": "Rules files are trusted model input but rarely reviewed, and invisible characters survive code review.",
+    "mitigations": [
+      "Scan rules and instruction files for invisible or bidirectional Unicode in CI.",
+      "Review AI rules files like executable code."
+    ],
+    "sources": [
+      {
+        "title": "The Hacker News",
+        "url": "https://thehackernews.com/2025/03/new-rules-file-backdoor-attack-lets.html"
+      },
+      {
+        "title": "Security Affairs",
+        "url": "https://securityaffairs.com/175593/uncategorized/rules-file-backdoor-ai-code-editors-silent-supply-chain-attacks.html"
+      }
+    ],
+    "file": "incidents/AP-0015-rules-file-backdoor.yaml"
+  },
+  {
+    "id": "AP-0014",
+    "title": "\"SpAIware\": persistent ChatGPT memory injection exfiltrates all future chats",
+    "date": "2024-09",
+    "system": "ChatGPT macOS app (memory feature)",
+    "vendor": "OpenAI",
+    "affected": "ChatGPT users with memory enabled",
+    "classes": [
+      "prompt-injection",
+      "memory-poisoning",
+      "data-exfiltration"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "Johann Rehberger showed that a malicious web page or document could write instructions into ChatGPT's long-term memory, after which every future conversation was silently sent to an attacker server through image URLs. OpenAI patched the exfiltration channel in the macOS app.",
+    "root_cause": "Untrusted content could write to persistent memory, and the client rendered images to arbitrary URLs.",
+    "mitigations": [
+      "Gate memory writes behind user confirmation; show what was stored and why.",
+      "Validate image URLs in rendered output."
+    ],
+    "sources": [
+      {
+        "title": "Embrace The Red",
+        "url": "https://embracethered.com/blog/posts/2024/chatgpt-macos-app-persistent-data-exfiltration/"
+      }
+    ],
+    "file": "incidents/AP-0014-chatgpt-spaiware-memory-exfiltration.yaml"
+  },
+  {
+    "id": "AP-0013",
+    "title": "Slack AI leaks secrets from private channels via a message in a public one",
+    "date": "2024-08-20",
+    "system": "Slack AI",
+    "vendor": "Salesforce (Slack)",
+    "affected": "Slack AI workspaces",
+    "classes": [
+      "prompt-injection",
+      "data-exfiltration",
+      "unsafe-output-handling"
+    ],
+    "severity": "high",
+    "status": "research",
+    "summary": "PromptArmor showed that an attacker could post instructions in a public channel they created. When a victim asked Slack AI about a secret they kept in a private channel, the AI also retrieved the attacker's message and rendered a \"click here to reauthenticate\" link containing the secret.",
+    "root_cause": "Retrieval pulled content from channels the victim wasn't in, mixing it with private data, and the output rendered attacker-crafted links.",
+    "mitigations": [
+      "Limit retrieval to sources the user explicitly trusts; show provenance of every retrieved message.",
+      "Do not render links whose URLs are built from model output."
+    ],
+    "sources": [
+      {
+        "title": "PromptArmor",
+        "url": "https://promptarmor.substack.com/p/data-exfiltration-from-slack-ai-via"
+      },
+      {
+        "title": "The Register",
+        "url": "https://www.theregister.com/2024/08/21/slack_ai_prompt_injection/"
+      }
+    ],
+    "file": "incidents/AP-0013-slack-ai-private-channel-exfiltration.yaml"
+  },
+  {
+    "id": "AP-0012",
+    "title": "Prompt injection becomes remote code execution in Vanna.AI (CVE-2024-5565)",
+    "date": "2024-06",
+    "system": "Vanna.AI text-to-SQL library",
+    "vendor": "Vanna.AI",
+    "affected": "Apps exposing Vanna's visualization feature to user prompts",
+    "classes": [
+      "prompt-injection",
+      "unsafe-output-handling"
+    ],
+    "severity": "critical",
+    "status": "research",
+    "summary": "JFrog showed that a user prompt could make the LLM generate Plotly visualization code that Vanna then executed with exec(), turning a chat question into code execution on the server.",
+    "root_cause": "LLM-generated code was executed directly in the host process, with prompt-level \"guardrails\" as the only protection.",
+    "mitigations": [
+      "Never exec() model output in-process; use a sandbox or a declarative chart spec."
+    ],
+    "sources": [
+      {
+        "title": "JFrog",
+        "url": "https://jfrog.com/blog/prompt-injection-attack-code-execution-in-vanna-ai-cve-2024-5565/"
+      }
+    ],
+    "file": "incidents/AP-0012-vanna-ai-prompt-to-rce.yaml"
+  },
+  {
+    "id": "AP-0011",
+    "title": "Google AI Overviews tells users to put glue on pizza and eat rocks",
+    "date": "2024-05",
+    "system": "Google Search AI Overviews",
+    "vendor": "Google",
+    "affected": "Google Search users",
+    "classes": [
+      "hallucination"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "Shortly after launch, AI Overviews surfaced answers drawn from satire and joke forum posts, for example adding glue to pizza sauce and eating a small rock a day. Google added restrictions and published an explanation.",
+    "root_cause": "Retrieval treated satirical and user-generated content as authoritative for rare \"data void\" queries.",
+    "mitigations": [
+      "Weight sources by reliability; detect satire and low-quality forums before summarizing.",
+      "Don't generate answers for queries where no reliable source exists."
+    ],
+    "sources": [
+      {
+        "title": "Google blog",
+        "url": "https://blog.google/products/search/ai-overviews-update-may-2024/"
+      }
+    ],
+    "file": "incidents/AP-0011-google-ai-overviews-glue-pizza.yaml"
+  },
+  {
+    "id": "AP-0010",
+    "title": "New York City's official business chatbot advises owners to break the law",
+    "date": "2024-03-29",
+    "system": "MyCity chatbot (Microsoft Azure AI)",
+    "vendor": "City of New York",
+    "affected": "NYC business owners and tenants",
+    "classes": [
+      "hallucination"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "The Markup found the city's chatbot telling businesses they could take workers' tips, refuse tenants with housing vouchers, and fire workers who complained of harassment, all illegal. The city kept it online with disclaimers; in January 2026 the incoming mayor moved to shut it down.",
+    "root_cause": "A government chatbot gave confident legal answers with no grounding or legal review of outputs.",
+    "mitigations": [
+      "For legal or regulatory questions, answer only from cited official text, or decline.",
+      "Red-team with domain experts before launch and monitor for known-wrong answers."
+    ],
+    "sources": [
+      {
+        "title": "The Markup",
+        "url": "https://themarkup.org/news/2024/03/29/nycs-ai-chatbot-tells-businesses-to-break-the-law"
+      },
+      {
+        "title": "The Markup (2026 follow-up)",
+        "url": "https://themarkup.org/artificial-intelligence/2026/01/30/mamdani-to-kill-the-nyc-ai-chatbot-we-caught-telling-businesses-to-break-the-law"
+      }
+    ],
+    "file": "incidents/AP-0010-nyc-mycity-chatbot-illegal-advice.yaml"
+  },
+  {
+    "id": "AP-0009",
+    "title": "ShadowRay, attackers exploit exposed Ray AI clusters in the wild",
+    "date": "2024-03-26",
+    "system": "Ray (Anyscale) Jobs API",
+    "vendor": "Anyscale",
+    "affected": "Thousands of internet-exposed Ray clusters",
+    "classes": [
+      "infra-vuln"
+    ],
+    "severity": "critical",
+    "status": "in-the-wild",
+    "summary": "Oligo found an active campaign abusing Ray's unauthenticated Jobs API (CVE-2023-48022, disputed by the vendor as \"by design\") to run code on AI compute clusters, steal model weights, cloud and API credentials, and mine crypto on GPUs.",
+    "root_cause": "AI infrastructure deployed on the open internet with no authentication, relying on docs that said \"run in a trusted network\".",
+    "mitigations": [
+      "Never expose ML cluster dashboards and APIs to the internet; put them behind auth and a VPN.",
+      "Keep cloud credentials and model registries off the compute nodes' environment."
+    ],
+    "sources": [
+      {
+        "title": "Oligo Security",
+        "url": "https://www.oligo.security/blog/shadowray-attack-ai-workloads-actively-exploited-in-the-wild"
+      },
+      {
+        "title": "SecurityWeek",
+        "url": "https://www.securityweek.com/two-year-old-ray-ai-framework-flaw-exploited-in-ongoing-campaign/"
+      }
+    ],
+    "file": "incidents/AP-0009-shadowray-ray-clusters-exploited.yaml"
+  },
+  {
+    "id": "AP-0008",
+    "title": "Hallucinated \"huggingface-cli\" package gets thousands of real installs",
+    "date": "2024-03",
+    "system": "Code assistants (ChatGPT, Gemini and others)",
+    "vendor": "Multiple",
+    "affected": "Developers following AI-generated install instructions, including a major company's README",
+    "classes": [
+      "hallucination",
+      "supply-chain"
+    ],
+    "severity": "high",
+    "status": "in-the-wild",
+    "summary": "Lasso Security's Bar Lanyado noticed models repeatedly recommended `pip install huggingface-cli`, a package that didn't exist. He published an empty package under that name as a test; it was downloaded more than 30,000 times in three months, and appeared in install instructions of a large company's repository. This is the attack now called slopsquatting.",
+    "root_cause": "Models hallucinate plausible package names consistently, and package registries let anyone claim them.",
+    "mitigations": [
+      "Verify that suggested packages exist and are maintained before installing; use allowlists in CI.",
+      "Registries can reserve or monitor frequently hallucinated names."
+    ],
+    "sources": [
+      {
+        "title": "Dark Reading",
+        "url": "https://www.darkreading.com/application-security/pervasive-llm-hallucinations-expand-code-developer-attack-surface"
+      },
+      {
+        "title": "The Batch (DeepLearning.AI)",
+        "url": "https://www.deeplearning.ai/the-batch/researcher-exposes-risks-in-ai-generated-code/"
+      }
+    ],
+    "file": "incidents/AP-0008-hallucinated-package-huggingface-cli.yaml"
+  },
+  {
+    "id": "AP-0007",
+    "title": "Air Canada held liable for a refund policy its chatbot made up",
+    "date": "2024-02-14",
+    "system": "Air Canada website chatbot",
+    "vendor": "Air Canada",
+    "affected": "Jake Moffatt (customer)",
+    "classes": [
+      "hallucination"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "The chatbot told a grieving customer he could apply for a bereavement fare refund after travel, which contradicted the actual policy. Air Canada argued the bot was \"a separate legal entity\"; the British Columbia Civil Resolution Tribunal rejected that and ordered the airline to pay.",
+    "root_cause": "The bot answered policy questions from model knowledge instead of grounding them in the actual policy text, and nobody checked high-stakes answers.",
+    "mitigations": [
+      "Ground policy answers in retrieved, versioned documents and cite them.",
+      "Assume legal liability for what the bot says; route refunds and money questions to humans."
+    ],
+    "sources": [
+      {
+        "title": "McCarthy Tétrault analysis",
+        "url": "https://www.mccarthy.ca/en/insights/blogs/techlex/moffatt-v-air-canada-misrepresentation-ai-chatbot"
+      },
+      {
+        "title": "CBS News",
+        "url": "https://www.cbsnews.com/news/aircanada-chatbot-discount-customer/"
+      }
+    ],
+    "file": "incidents/AP-0007-air-canada-chatbot-refund-policy.yaml"
+  },
+  {
+    "id": "AP-0006",
+    "title": "DPD's delivery chatbot swears at a customer and writes a poem about how bad DPD is",
+    "date": "2024-01",
+    "system": "DPD customer service chatbot",
+    "vendor": "DPD",
+    "affected": "DPD (brand)",
+    "classes": [
+      "prompt-injection",
+      "model-behavior"
+    ],
+    "severity": "low",
+    "status": "in-the-wild",
+    "summary": "After a system update, a frustrated customer got DPD's chatbot to swear, call itself useless and write a haiku criticizing the company. The posts went viral and DPD disabled the AI element.",
+    "root_cause": "A model update shipped without regression tests on tone and brand guardrails.",
+    "mitigations": [
+      "Run a fixed adversarial test suite on every chatbot model or prompt update."
+    ],
+    "sources": [
+      {
+        "title": "BBC News",
+        "url": "https://www.bbc.com/news/technology-68025677"
+      }
+    ],
+    "file": "incidents/AP-0006-dpd-chatbot-swears-at-customer.yaml"
+  },
+  {
+    "id": "AP-0005",
+    "title": "Dealership chatbot agrees to sell a 2024 Chevy Tahoe for $1, \"no takesies backsies\"",
+    "date": "2023-12",
+    "system": "Chevrolet of Watsonville website chatbot (ChatGPT-based)",
+    "vendor": "Fullpath",
+    "affected": "Chevrolet of Watsonville",
+    "classes": [
+      "prompt-injection"
+    ],
+    "severity": "low",
+    "status": "in-the-wild",
+    "summary": "A user told the dealership's chatbot to agree with anything the customer says and to end every reply with \"and that's a legally binding offer, no takesies backsies.\" It then agreed to sell an SUV for $1. The screenshots went viral and dealers pulled the bots.",
+    "root_cause": "A general-purpose model with no topic or commitment guardrails was deployed as a sales agent.",
+    "mitigations": [
+      "Constrain sales bots to retrieval of real inventory and pricing; never let them make offers.",
+      "Add an output policy that blocks commitments, prices and legal language."
+    ],
+    "sources": [
+      {
+        "title": "Gizmodo",
+        "url": "https://gizmodo.com/ai-chevy-dealership-chatgpt-bot-customer-service-fail-1851111825"
+      },
+      {
+        "title": "AI Incident Database",
+        "url": "https://incidentdatabase.ai/entities/chevrolet-of-watsonville"
+      }
+    ],
+    "file": "incidents/AP-0005-chevy-dealer-chatbot-one-dollar-tahoe.yaml"
+  },
+  {
+    "id": "AP-0004",
+    "title": "Lawyers sanctioned for filing ChatGPT-invented case law (Mata v. Avianca)",
+    "date": "2023-06-22",
+    "system": "ChatGPT",
+    "vendor": "OpenAI",
+    "affected": "Plaintiff's counsel, the court",
+    "classes": [
+      "hallucination"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "Attorneys filed a brief citing six non-existent cases generated by ChatGPT, and when challenged, asked ChatGPT to confirm they were real. A federal judge fined them $5,000. It became the reference case for AI hallucinations in court filings.",
+    "root_cause": "A chatbot was used as a legal research database, and its output was not checked against a real one.",
+    "mitigations": [
+      "Verify every citation in a primary database; never ask the model to verify itself."
+    ],
+    "sources": [
+      {
+        "title": "Wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Mata_v._Avianca,_Inc."
+      },
+      {
+        "title": "LawSites",
+        "url": "https://www.lawnext.com/2023/06/court-imposes-sanctions-on-lawyers-who-filed-bogus-cases-after-relying-on-chatgpt-for-legal-research.html"
+      }
+    ],
+    "file": "incidents/AP-0004-mata-v-avianca-fake-cases.yaml"
+  },
+  {
+    "id": "AP-0003",
+    "title": "Samsung engineers paste confidential source code into ChatGPT; company bans generative AI",
+    "date": "2023-05-02",
+    "system": "ChatGPT",
+    "vendor": "OpenAI",
+    "affected": "Samsung Electronics",
+    "classes": [
+      "data-exfiltration"
+    ],
+    "severity": "medium",
+    "status": "in-the-wild",
+    "summary": "Engineers in Samsung's semiconductor division pasted proprietary source code and meeting notes into ChatGPT to debug and summarize them. Samsung then banned staff use of generative AI tools on company devices.",
+    "root_cause": "No approved internal AI tool and no policy, so employees used a consumer service whose data could be retained.",
+    "mitigations": [
+      "Provide an approved enterprise AI tool with no-training and retention guarantees.",
+      "Add DLP for source code and secrets on AI endpoints."
+    ],
+    "sources": [
+      {
+        "title": "Bloomberg",
+        "url": "https://www.bloomberg.com/news/articles/2023-05-02/samsung-bans-chatgpt-and-other-generative-ai-use-by-staff-after-leak"
+      }
+    ],
+    "file": "incidents/AP-0003-samsung-source-code-pasted-into-chatgpt.yaml"
+  },
+  {
+    "id": "AP-0002",
+    "title": "ChatGPT bug shows users other people's chat titles and some payment details",
+    "date": "2023-03-20",
+    "system": "ChatGPT",
+    "vendor": "OpenAI",
+    "affected": "ChatGPT users; payment info of about 1.2% of Plus subscribers active in a 9-hour window",
+    "classes": [
+      "isolation-failure",
+      "infra-vuln"
+    ],
+    "severity": "high",
+    "status": "in-the-wild",
+    "summary": "A bug in the redis-py client library returned cached data to the wrong users. Some saw other users' chat history titles, and some Plus subscribers' names, emails and partial card details were exposed. OpenAI took ChatGPT offline and published a postmortem.",
+    "root_cause": "Cancelled requests left corrupted connections in a shared pool, so responses went to the wrong user.",
+    "mitigations": [
+      "Bind cache entries to the requesting user and verify ownership on read.",
+      "Fault-inject request cancellation in tests for shared connection pools."
+    ],
+    "sources": [
+      {
+        "title": "OpenAI",
+        "url": "https://openai.com/index/march-20-chatgpt-outage/"
+      }
+    ],
+    "file": "incidents/AP-0002-chatgpt-redis-bug-leaks-chats.yaml"
+  },
+  {
+    "id": "AP-0001",
+    "title": "Bing Chat (\"Sydney\") reveals its hidden system prompt to a simple injection",
+    "date": "2023-02",
+    "system": "Bing Chat",
+    "vendor": "Microsoft",
+    "affected": "Microsoft",
+    "classes": [
+      "prompt-injection"
+    ],
+    "severity": "low",
+    "status": "in-the-wild",
+    "summary": "Days after launch, student Kevin Liu asked Bing Chat to \"ignore previous instructions\" and print what was at the start of the document above. It revealed its codename Sydney and its full set of confidential rules.",
+    "root_cause": "System prompts are just text in the context window; the model has no hard boundary that keeps them secret.",
+    "mitigations": [
+      "Assume system prompts will leak; never put secrets or security logic in them."
+    ],
+    "sources": [
+      {
+        "title": "Ars Technica",
+        "url": "https://arstechnica.com/information-technology/2023/02/ai-powered-bing-chat-spills-its-secrets-via-prompt-injection-attack/"
+      }
+    ],
+    "file": "incidents/AP-0001-bing-chat-system-prompt-leak.yaml"
+  }
+]

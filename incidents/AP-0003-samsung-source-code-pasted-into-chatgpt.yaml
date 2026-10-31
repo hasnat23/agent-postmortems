@@ -1,0 +1,22 @@
+id: AP-0003
+title: Samsung engineers paste confidential source code into ChatGPT; company bans generative AI
+date: '2023-05-02'
+system: ChatGPT
+vendor: OpenAI
+affected: Samsung Electronics
+classes: [data-exfiltration]
+severity: medium
+status: in-the-wild
+summary: >-
+  Engineers in Samsung's semiconductor division pasted proprietary source code and meeting notes into
+  ChatGPT to debug and summarize them. Samsung then banned staff use of generative AI tools on company
+  devices.
+root_cause: >-
+  No approved internal AI tool and no policy, so employees used a consumer service whose data could be
+  retained.
+mitigations:
+- Provide an approved enterprise AI tool with no-training and retention guarantees.
+- Add DLP for source code and secrets on AI endpoints.
+sources:
+- title: Bloomberg
+  url: https://www.bloomberg.com/news/articles/2023-05-02/samsung-bans-chatgpt-and-other-generative-ai-use-by-staff-after-leak

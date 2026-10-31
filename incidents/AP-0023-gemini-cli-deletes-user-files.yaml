@@ -1,0 +1,22 @@
+id: AP-0023
+title: Gemini CLI loses a user's files after acting on a mkdir that never succeeded
+date: '2025-07'
+system: Gemini CLI
+vendor: Google
+affected: Individual developer
+classes: [destructive-action]
+severity: high
+status: in-the-wild
+summary: >-
+  Asked to rename and move a folder, Gemini CLI issued a mkdir that silently failed, then ran move commands
+  into the non-existent directory. Each move overwrote the previous file, destroying the data. The agent
+  concluded "I have failed you completely and catastrophically."
+root_cause: >-
+  The agent never verified the result of a state-changing command (read-after-write) and kept building
+  on a hallucinated file-system state.
+mitigations:
+- Check exit codes and re-read state after every file-system mutation.
+- Run agents in a git-tracked or snapshotted workspace so moves and deletes are reversible.
+sources:
+- title: Ars Technica
+  url: https://arstechnica.com/information-technology/2025/07/ai-coding-assistants-chase-phantoms-destroy-real-user-data/

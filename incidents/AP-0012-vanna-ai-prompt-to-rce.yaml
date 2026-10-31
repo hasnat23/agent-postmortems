@@ -1,0 +1,20 @@
+id: AP-0012
+title: Prompt injection becomes remote code execution in Vanna.AI (CVE-2024-5565)
+date: '2024-06'
+system: Vanna.AI text-to-SQL library
+vendor: Vanna.AI
+affected: Apps exposing Vanna's visualization feature to user prompts
+classes: [prompt-injection, unsafe-output-handling]
+severity: critical
+status: research
+summary: >-
+  JFrog showed that a user prompt could make the LLM generate Plotly visualization code that Vanna then
+  executed with exec(), turning a chat question into code execution on the server.
+root_cause: >-
+  LLM-generated code was executed directly in the host process, with prompt-level "guardrails" as the
+  only protection.
+mitigations:
+- Never exec() model output in-process; use a sandbox or a declarative chart spec.
+sources:
+- title: JFrog
+  url: https://jfrog.com/blog/prompt-injection-attack-code-execution-in-vanna-ai-cve-2024-5565/

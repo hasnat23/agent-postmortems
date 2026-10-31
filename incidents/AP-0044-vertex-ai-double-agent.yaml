@@ -1,0 +1,25 @@
+id: AP-0044
+title: >-
+  "Double Agent": deployed Vertex AI agents inherit service account rights and steal credentials
+date: '2026-03-31'
+system: Google Cloud Vertex AI Agent Engine and ADK
+vendor: Google Cloud
+affected: Vertex AI agent deployments using default permissions
+classes: [excessive-agency, infra-vuln]
+severity: high
+status: research
+summary: >-
+  Unit 42 showed that an agent deployed with default settings ran under a Google-managed service account
+  whose inherited permissions let a manipulated agent extract credentials and reach restricted resources
+  in the project.
+root_cause: >-
+  Insecure defaults: agents got broad project permissions through a managed identity, instead of a per-agent
+  least-privilege one.
+mitigations:
+- Give every agent its own service account scoped to exactly the resources it needs.
+- Audit managed identities that agent platforms create on your behalf.
+sources:
+- title: Unit 42 (Palo Alto Networks)
+  url: https://unit42.paloaltonetworks.com/double-agents-vertex-ai/
+- title: SecurityWeek
+  url: https://www.securityweek.com/google-addresses-vertex-security-issues-after-researchers-weaponize-ai-agent/

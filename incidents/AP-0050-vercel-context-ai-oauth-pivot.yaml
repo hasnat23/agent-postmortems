@@ -1,0 +1,23 @@
+id: AP-0050
+title: >-
+  Compromised AI tool Context.ai becomes a path into Vercel employee accounts and customer secrets
+date: '2026-04-19'
+system: Context.ai (third-party AI service) + Google Workspace OAuth
+vendor: Context.ai / Vercel
+affected: A subset of Vercel customers
+classes: [supply-chain, excessive-agency, data-exfiltration]
+severity: high
+status: in-the-wild
+summary: >-
+  An attacker compromised Context.ai, used its OAuth access to take over a Vercel employee's Google Workspace
+  account, then moved into their Vercel account and decrypted customer environment variables that weren't
+  marked as sensitive. Affected customers had to rotate secrets.
+root_cause: >-
+  A third-party AI tool held broad OAuth grants to employee accounts, and secrets not flagged as sensitive
+  were readable by staff accounts.
+mitigations:
+- Review and minimize OAuth scopes granted to AI tools; revoke unused grants.
+- Mark all secrets as sensitive by default.
+sources:
+- title: Varonis
+  url: https://www.varonis.com/blog/vercel-breach-2026

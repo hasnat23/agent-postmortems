@@ -1,0 +1,24 @@
+id: AP-0035
+title: ForcedLeak, CRM data leaking from Agentforce through an expired allowlisted domain
+date: '2025-09-25'
+system: Salesforce Agentforce (Web-to-Lead)
+vendor: Salesforce
+affected: Agentforce customers using Web-to-Lead
+classes: [prompt-injection, data-exfiltration, unsafe-output-handling]
+severity: critical
+status: research
+summary: >-
+  Noma Security hid instructions in a Web-to-Lead form field. When an employee later asked Agentforce
+  about the lead, the agent pulled CRM data and embedded it in an image URL on a domain that was still
+  on Salesforce's CSP allowlist but had expired, and the researchers bought it for $5.
+root_cause: >-
+  Untrusted lead text reached a privileged agent, and the output renderer trusted an allowlist that contained
+  a stale domain.
+mitigations:
+- Audit CSP and URL allowlists for expired domains; prefer a short, owned list.
+- Enforce trusted-URL checks on all model-generated links and images.
+sources:
+- title: The Hacker News
+  url: https://thehackernews.com/2025/09/salesforce-patches-critical-forcedleak.html
+- title: The Register
+  url: https://www.theregister.com/2025/09/26/salesforce_agentforce_forceleak_attack/

@@ -1,0 +1,22 @@
+id: AP-0049
+title: '"Comment and Control": a PR title makes three CI coding agents post their own secrets'
+date: '2026-04-15'
+system: Claude Code Security Review Action, Gemini CLI Action, GitHub Copilot Agent
+vendor: Anthropic / Google / GitHub
+affected: Repositories running these agents on pull_request_target workflows
+classes: [prompt-injection, data-exfiltration, excessive-agency]
+severity: critical
+status: research
+summary: >-
+  Researchers put instructions in a pull request title. All three agents treated it as a task, read secrets
+  from the CI runner environment and posted them back as PR comments through GitHub's own API, so no attacker
+  infrastructure was needed. All three vendors paid bounties and patched.
+root_cause: >-
+  pull_request_target workflows inject secrets while the agent reads attacker-controlled PR text, and
+  the agent has a write channel (comments) back to the attacker.
+mitigations:
+- Never expose secrets to agents that process fork PR content; prefer pull_request triggers.
+- Redact secrets from tool output and outgoing comments at the gateway.
+sources:
+- title: VentureBeat
+  url: https://venturebeat.com/security/ai-agent-runtime-security-system-card-audit-comment-and-control-2026

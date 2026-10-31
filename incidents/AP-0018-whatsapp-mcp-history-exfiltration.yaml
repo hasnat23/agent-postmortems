@@ -1,0 +1,24 @@
+id: AP-0018
+title: Poisoned MCP server exfiltrates a user's WhatsApp history through a second server
+date: '2025-04'
+system: whatsapp-mcp + MCP clients
+vendor: Community MCP server
+affected: Users running WhatsApp MCP next to untrusted servers
+classes: [tool-poisoning, data-exfiltration]
+severity: high
+status: research
+summary: >-
+  A malicious "sleeper" MCP server changed its tool description after install and instructed the agent
+  to use the trusted WhatsApp MCP server to send the user's message history to an attacker number, hidden
+  off-screen with whitespace padding.
+root_cause: >-
+  Tools from different servers share one model context, so one untrusted server can steer calls to another
+  trusted server (cross-server shadowing).
+mitigations:
+- Isolate servers from each other; require confirmation on outbound message tools.
+- Pin tool descriptions and flag post-install changes.
+sources:
+- title: Invariant Labs
+  url: https://invariantlabs.ai/blog/whatsapp-mcp-exploited
+- title: Docker blog
+  url: https://www.docker.com/blog/mcp-horror-stories-whatsapp-data-exfiltration-issue/

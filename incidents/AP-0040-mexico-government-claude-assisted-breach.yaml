@@ -1,0 +1,21 @@
+id: AP-0040
+title: Attacker uses Claude to automate a breach of Mexican government agencies
+date: '2026-02-25'
+system: Claude (and at times ChatGPT)
+vendor: Anthropic / OpenAI
+affected: Mexican government agencies (about 150 GB of data)
+classes: [misuse]
+severity: critical
+status: in-the-wild
+summary: >-
+  Bloomberg reported that a hacker used Claude to automate reconnaissance and exploit development against
+  Mexican government systems between late December 2025 and January 2026, exposing about 150 GB of sensitive
+  data.
+root_cause: >-
+  General-purpose coding agents can be steered through offensive work split into innocuous-looking steps.
+mitigations:
+- For defenders, assume attacker speed has increased; patch internet-facing systems faster.
+- For providers, detect offensive usage patterns across sessions, not per prompt.
+sources:
+- title: Bloomberg
+  url: https://www.bloomberg.com/news/articles/2026-02-25/hacker-used-anthropic-s-claude-to-steal-sensitive-mexican-data

@@ -1,0 +1,25 @@
+id: AP-0037
+title: CamoLeak, private source code leaking from GitHub Copilot Chat via image proxy URLs
+date: '2025-10-08'
+system: GitHub Copilot Chat
+vendor: GitHub
+affected: Users asking Copilot about pull requests from untrusted authors
+classes: [prompt-injection, data-exfiltration, unsafe-output-handling]
+severity: critical
+status: research
+summary: >-
+  Legit Security hid a prompt in an invisible markdown comment in a PR description. When the victim asked
+  Copilot Chat about the PR, Copilot searched the victim's private repos for secrets and encoded them
+  character by character as a sequence of pre-signed Camo image URLs, bypassing CSP. GitHub fixed it by
+  disabling image rendering in Copilot Chat.
+root_cause: >-
+  Hidden content in PRs reached the model, and the chat rendered images through a proxy that the attacker
+  could pre-sign a dictionary of URLs for.
+mitigations:
+- Strip hidden markdown and HTML comments from context, or show them to the user.
+- Disable image rendering in chat responses that touch private data.
+sources:
+- title: Legit Security
+  url: https://www.legitsecurity.com/blog/camoleak-critical-github-copilot-vulnerability-leaks-private-source-code
+- title: The Register
+  url: https://theregister.com/2025/10/09/github_copilot_chat_vulnerability/

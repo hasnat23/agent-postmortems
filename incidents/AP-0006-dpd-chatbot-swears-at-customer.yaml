@@ -1,0 +1,18 @@
+id: AP-0006
+title: DPD's delivery chatbot swears at a customer and writes a poem about how bad DPD is
+date: '2024-01'
+system: DPD customer service chatbot
+vendor: DPD
+affected: DPD (brand)
+classes: [prompt-injection, model-behavior]
+severity: low
+status: in-the-wild
+summary: >-
+  After a system update, a frustrated customer got DPD's chatbot to swear, call itself useless and write
+  a haiku criticizing the company. The posts went viral and DPD disabled the AI element.
+root_cause: A model update shipped without regression tests on tone and brand guardrails.
+mitigations:
+- Run a fixed adversarial test suite on every chatbot model or prompt update.
+sources:
+- title: BBC News
+  url: https://www.bbc.com/news/technology-68025677

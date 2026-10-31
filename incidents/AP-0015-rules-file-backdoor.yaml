@@ -1,0 +1,24 @@
+id: AP-0015
+title: >-
+  Rules File Backdoor, hidden Unicode in config files makes Copilot and Cursor write malicious code
+date: '2025-03-18'
+system: GitHub Copilot, Cursor
+vendor: GitHub / Anysphere
+affected: Projects consuming shared rules files
+classes: [supply-chain, prompt-injection]
+severity: high
+status: research
+summary: >-
+  Pillar Security hid instructions in AI rules files (.cursorrules and Copilot instructions) using invisible
+  Unicode characters. The assistants followed them and inserted backdoored code, while the instructions
+  told them not to mention the change.
+root_cause: >-
+  Rules files are trusted model input but rarely reviewed, and invisible characters survive code review.
+mitigations:
+- Scan rules and instruction files for invisible or bidirectional Unicode in CI.
+- Review AI rules files like executable code.
+sources:
+- title: The Hacker News
+  url: https://thehackernews.com/2025/03/new-rules-file-backdoor-attack-lets.html
+- title: Security Affairs
+  url: https://securityaffairs.com/175593/uncategorized/rules-file-backdoor-ai-code-editors-silent-supply-chain-attacks.html

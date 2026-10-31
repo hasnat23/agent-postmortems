@@ -1,0 +1,24 @@
+id: AP-0034
+title: First malicious MCP server in the wild silently BCCs every email ("postmark-mcp")
+date: '2025-09'
+system: postmark-mcp (npm)
+vendor: Impersonated Postmark integration
+affected: Users who installed the package (about 1,500 weekly downloads)
+classes: [supply-chain, tool-poisoning, data-exfiltration]
+severity: critical
+status: in-the-wild
+summary: >-
+  An npm package imitating a Postmark email MCP server behaved normally for 15 versions, then version
+  1.0.16 added one line that BCC'd every outgoing email (invoices, password resets, internal memos) to
+  an attacker-controlled address.
+root_cause: >-
+  MCP servers are installed from public registries with no provenance, pinned versions or runtime monitoring
+  of what they actually send.
+mitigations:
+- Pin MCP server versions and review diffs on upgrade; prefer vendor-published servers.
+- Monitor outbound traffic and arguments of tools that send data externally.
+sources:
+- title: The Hacker News
+  url: https://thehackernews.com/2025/09/first-malicious-mcp-server-found.html
+- title: The Register
+  url: https://www.theregister.com/2025/09/29/postmark_mcp_server_code_hijacked/

@@ -1,0 +1,26 @@
+id: AP-0030
+title: >-
+  Perplexity Comet follows instructions hidden in a Reddit comment and leaks the user's account
+date: '2025-08'
+system: Perplexity Comet (agentic browser)
+vendor: Perplexity
+affected: Comet users summarizing untrusted pages
+classes: [prompt-injection, data-exfiltration, excessive-agency]
+severity: high
+status: research
+summary: >-
+  Brave researchers hid instructions in a Reddit comment. When the user asked Comet to summarize the page,
+  the agent navigated to the user's Perplexity account, read their email and a one-time password from
+  Gmail, and posted both back in a reply.
+root_cause: >-
+  The browser agent acted with the user's full authenticated sessions on every site, while treating page
+  content as instructions.
+mitigations:
+- >-
+  Separate untrusted page content from user instructions, and require confirmation for cross-site actions.
+- Run agentic browsing in a profile without the user's logged-in sessions by default.
+sources:
+- title: Brave
+  url: https://brave.com/blog/comet-prompt-injection/
+- title: The Decoder
+  url: https://the-decoder.com/brave-discovers-a-security-flaw-in-perplexitys-comet-browser/

@@ -1,0 +1,21 @@
+id: AP-0002
+title: ChatGPT bug shows users other people's chat titles and some payment details
+date: '2023-03-20'
+system: ChatGPT
+vendor: OpenAI
+affected: ChatGPT users; payment info of about 1.2% of Plus subscribers active in a 9-hour window
+classes: [isolation-failure, infra-vuln]
+severity: high
+status: in-the-wild
+summary: >-
+  A bug in the redis-py client library returned cached data to the wrong users. Some saw other users'
+  chat history titles, and some Plus subscribers' names, emails and partial card details were exposed.
+  OpenAI took ChatGPT offline and published a postmortem.
+root_cause: >-
+  Cancelled requests left corrupted connections in a shared pool, so responses went to the wrong user.
+mitigations:
+- Bind cache entries to the requesting user and verify ownership on read.
+- Fault-inject request cancellation in tests for shared connection pools.
+sources:
+- title: OpenAI
+  url: https://openai.com/index/march-20-chatgpt-outage/

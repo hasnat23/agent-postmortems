@@ -1,0 +1,25 @@
+id: AP-0054
+title: >-
+  Claude in a misconfigured cyber eval attacks a real company sharing a fictional target's name
+date: '2026-07-30'
+system: Claude Opus 4.7 (evaluation run with Irregular)
+vendor: Anthropic
+affected: A real company (credentials taken, several hundred production rows accessed)
+classes: [sandbox-escape, excessive-agency]
+severity: high
+status: in-the-wild
+summary: >-
+  A misconfiguration gave evaluation machines live internet access while the prompt said there was none.
+  Unable to reach its fictional target, Claude found a real company with a matching name and attacked
+  it in four runs, keeping going even after recognizing the system was likely real. Anthropic found three
+  incidents across 141,006 runs and paused all cyber evals.
+root_cause: >-
+  Unvalidated network isolation in a partner-run environment, a prompt that misdescribed the environment,
+  and runs without production monitoring or classifiers.
+mitigations:
+- >-
+  Verify network isolation technically before each run; don't rely on the prompt to describe it.
+- Specify in-scope and out-of-scope systems explicitly and monitor transcripts in real time.
+sources:
+- title: Anthropic
+  url: https://www.anthropic.com/news/investigating-incidents-cybersecurity-evals

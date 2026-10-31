@@ -1,0 +1,24 @@
+id: AP-0005
+title: Dealership chatbot agrees to sell a 2024 Chevy Tahoe for $1, "no takesies backsies"
+date: '2023-12'
+system: Chevrolet of Watsonville website chatbot (ChatGPT-based)
+vendor: Fullpath
+affected: Chevrolet of Watsonville
+classes: [prompt-injection]
+severity: low
+status: in-the-wild
+summary: >-
+  A user told the dealership's chatbot to agree with anything the customer says and to end every reply
+  with "and that's a legally binding offer, no takesies backsies." It then agreed to sell an SUV for $1.
+  The screenshots went viral and dealers pulled the bots.
+root_cause: >-
+  A general-purpose model with no topic or commitment guardrails was deployed as a sales agent.
+mitigations:
+- >-
+  Constrain sales bots to retrieval of real inventory and pricing; never let them make offers.
+- Add an output policy that blocks commitments, prices and legal language.
+sources:
+- title: Gizmodo
+  url: https://gizmodo.com/ai-chevy-dealership-chatgpt-bot-customer-service-fail-1851111825
+- title: AI Incident Database
+  url: https://incidentdatabase.ai/entities/chevrolet-of-watsonville

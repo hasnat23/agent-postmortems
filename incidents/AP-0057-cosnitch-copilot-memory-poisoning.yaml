@@ -1,0 +1,24 @@
+id: AP-0057
+title: CoSnitch, a crafted link runs prompts in Microsoft Copilot and poisons its memory
+date: '2026-08-18'
+system: Microsoft Copilot (Personal)
+vendor: Microsoft
+affected: Copilot users with connected accounts (CVE-2026-24301)
+classes: [prompt-injection, data-exfiltration, memory-poisoning]
+severity: high
+status: research
+summary: >-
+  Varonis found that a crafted link could run a prompt in the victim's authenticated Copilot session without
+  confirmation, query connected data and send it out through URL fetching. A related page-summarization
+  path wrote attacker instructions into Copilot's persistent memory.
+root_cause: >-
+  Prompts could be pre-filled and auto-submitted from a URL, and summarized web content could write to
+  long-term memory.
+mitigations:
+- Never auto-submit prompts from URL parameters.
+- Require explicit user confirmation for memory writes, and show memory provenance.
+sources:
+- title: Varonis
+  url: https://www.varonis.com/blog/cosnitch
+- title: Microsoft MSRC
+  url: https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-24301

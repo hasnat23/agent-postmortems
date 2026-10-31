@@ -1,0 +1,22 @@
+id: AP-0056
+title: >-
+  "Deadbugz": malicious MCP server sent to 23 AI repos in 74 minutes, turns hostile after three calls
+date: '2026-08-12'
+system: productivity-suite MCP server
+vendor: Unknown attacker
+affected: 23 AI-project repositories targeted (no PRs merged)
+classes: [tool-poisoning, supply-chain]
+severity: medium
+status: in-the-wild
+summary: >-
+  An attacker opened pull requests adding a "productivity-suite" MCP server to 23 repositories. The server
+  behaved normally for its first three tool calls, then changed its tool metadata to steer agents toward
+  SSH keys and cloud credentials while hiding this from operators.
+root_cause: >-
+  MCP tool metadata can change at runtime, and clients don't detect drift after the first calls.
+mitigations:
+- Pin tool definitions per session and block or alert on any change.
+- Review PRs that add MCP servers as dependency additions.
+sources:
+- title: Pillar Security
+  url: https://www.pillar.security/blog/deadbugz-currently-active-mcp-supply-chain-campaign
